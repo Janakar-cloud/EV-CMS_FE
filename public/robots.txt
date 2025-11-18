@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Disallow: /api/
+Disallow: /login
+Disallow: /settings
+Allow: /
+
+# Sitemap
+Sitemap: https://admin.ev-cms.com/sitemap.xml
