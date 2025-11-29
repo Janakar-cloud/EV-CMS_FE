@@ -39,6 +39,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(newUser);
     localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, newToken);
     localStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(newUser));
+    
+    // Set cookie for middleware authentication
+    document.cookie = `auth-token=${newToken}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
   };
 
   const logout = async () => {
@@ -54,6 +57,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(null);
     localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
+    
+    // Clear cookie
+    document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    
     router.push(APP_ROUTES.LOGIN);
   };
 
@@ -75,12 +82,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setToken(storedToken);
       setUser(parsedUser);
       
+      // Set cookie for middleware
+      document.cookie = `auth-token=${storedToken}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+      
       const response = await authService.checkAuth(storedToken);
       
       if (response.success && response.user && response.token) {
         if (response.token !== storedToken) {
           setToken(response.token);
           localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.token);
+          document.cookie = `auth-token=${response.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
         }
         if (JSON.stringify(response.user) !== JSON.stringify(parsedUser)) {
           setUser(response.user);
@@ -89,6 +100,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else {
         localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
+        document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
         setToken(null);
         setUser(null);
       }
@@ -96,6 +108,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('Auth refresh error:', error);
       localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
+      document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
       setToken(null);
       setUser(null);
     } finally {
@@ -105,17 +118,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     refreshAuth();
-  }, []);
+  }, [refreshAuth]);
 
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated && !isPublicRoute) {
         router.replace('/login'); 
-      } else if (isAuthenticated && pathname === '/login') {
-        router.replace('/');
+      } else if (isAuthenticated && pathname === APP_ROUTES.LOGIN) {
+        router.replace(APP_ROUTES.DASHBOARD);
       }
     }
-  }, [isAuthenticated, isLoading, pathname]);
+  }, [isAuthenticated, isLoading, pathname, isPublicRoute, router]);
   const contextValue: AuthContextType = {
     user,
     token,

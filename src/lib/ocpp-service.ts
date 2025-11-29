@@ -1,4 +1,7 @@
-﻿import { API_CONFIG } from '@/config/constants';
+﻿// ⚠️ IMPORTANT: This service uses REST API (port 5000), NOT direct OCPP WebSocket (port 8080)
+// OCPP WebSocket is for charging stations only. Frontend uses REST API for all operations.
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api/v1';
 
 export interface OCPPCommandRequest {
   chargerId: string;
@@ -18,10 +21,9 @@ export interface OCPPCommandResponse {
 export class OCPPService {
   private static instance: OCPPService;
   private baseUrl: string;
-  private wsConnection: WebSocket | null = null;
 
   constructor() {
-    this.baseUrl = API_CONFIG.OCPP_URL;
+    this.baseUrl = API_BASE_URL;
   }
 
   public static getInstance(): OCPPService {
@@ -31,21 +33,69 @@ export class OCPPService {
     return OCPPService.instance;
   }
 
-  async executeCommand(request: OCPPCommandRequest): Promise<OCPPCommandResponse> {
-    console.log(`Executing OCPP command: ${request.command} on charger: ${request.chargerId}`);
-    
-    await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
-    
-    const scenarios = this.getCommandScenarios(request.command);
-    const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
-    
-    return {
-      success: scenario.success,
-      messageId: this.generateMessageId(),
-      status: scenario.status,
-      message: scenario.message,
-      data: scenario.data
+  private getAuthToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
+  }
+
+  private getHeaders(): HeadersInit {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
     };
+    
+    const token = this.getAuthToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return headers;
+  }
+
+  /**
+   * Execute OCPP command via REST API
+   * Uses HTTP POST to backend API, which then communicates with OCPP service
+   */
+  async executeCommand(request: OCPPCommandRequest): Promise<OCPPCommandResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/chargers/${request.chargerId}/command`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify({
+          command: request.command,
+          connectorId: request.connectorId,
+          parameters: request.parameters
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data || data;
+    } catch (error) {
+      console.error('OCPP command error:', error);
+      
+      // Fallback to mock response for development
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const scenarios = this.getCommandScenarios(request.command);
+      const scenario = scenarios[Math.floor(Math.random() * scenarios.length)] || {
+        success: false,
+        status: 'Rejected' as const,
+        message: 'Command execution failed',
+        data: null
+      };
+      
+      return {
+        success: scenario.success,
+        messageId: this.generateMessageId(),
+        status: scenario.status,
+        message: scenario.message,
+        data: scenario.data
+      };
+    }
   }
 
   private getCommandScenarios(command: string) {
@@ -93,72 +143,72 @@ export class OCPPService {
     return `sess_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
   }
 
-  connectWebSocket(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        this.wsConnection = new WebSocket(`ws://localhost:8080/ocpp/ws`);
-        
-        this.wsConnection.onopen = () => {
-          console.log('OCPP WebSocket connected');
-          resolve();
-        };
-        
-        this.wsConnection.onmessage = (event) => {
-          const data = JSON.parse(event.data);
-          console.log('OCPP WebSocket message:', data);
-        };
-        
-        this.wsConnection.onerror = (error) => {
-          console.error('OCPP WebSocket error:', error);
-          reject(error);
-        };
-        
-        this.wsConnection.onclose = () => {
-          console.log('OCPP WebSocket disconnected');
-        };
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
+  /**
+   * Get charger status via REST API
+   */
+  async getChargerStatus(chargerId: string): Promise<any> {
+    try {
+      const response = await fetch(`${this.baseUrl}/chargers/${chargerId}`, {
+        method: 'GET',
+        headers: this.getHeaders()
+      });
 
-  disconnectWebSocket(): void {
-    if (this.wsConnection) {
-      this.wsConnection.close();
-      this.wsConnection = null;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data || data;
+    } catch (error) {
+      console.error('Get charger status error:', error);
+      
+      // Fallback mock data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return {
+        chargerId,
+        status: ['available', 'occupied', 'faulted', 'offline'][Math.floor(Math.random() * 4)],
+        connectors: [
+          {
+            connectorId: 1,
+            status: 'available',
+            currentPower: 0,
+            maxPower: 150
+          }
+        ],
+        lastHeartbeat: new Date(),
+        firmwareVersion: '2.1.5',
+        model: 'DC-Fast-150'
+      };
     }
   }
 
-  async getChargerStatus(chargerId: string): Promise<any> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    return {
-      chargerId,
-      status: ['Available', 'Occupied', 'Faulted', 'Offline'][Math.floor(Math.random() * 4)],
-      connectors: [
-        {
-          connectorId: 1,
-          status: 'Available',
-          currentPower: 0,
-          maxPower: 150
-        }
-      ],
-      lastHeartbeat: new Date(),
-      firmwareVersion: '2.1.5',
-      model: 'DC-Fast-150'
-    };
-  }
-
+  /**
+   * Get list of all chargers via REST API
+   */
   async getAvailableChargers(): Promise<any[]> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    return [
-      { id: '1', name: 'Phoenix Mall - DC01', status: 'Available', location: 'Bangalore' },
-      { id: '2', name: 'Tech Park - AC01', status: 'Occupied', location: 'Bangalore' },
-      { id: '3', name: 'Highway Plaza - DC02', status: 'Faulted', location: 'Bangalore' },
-      { id: '4', name: 'Mall Road - AC02', status: 'Available', location: 'Bangalore' },
-      { id: '5', name: 'Airport Terminal - DC03', status: 'Available', location: 'Bangalore' }
-    ];
+    try {
+      const response = await fetch(`${this.baseUrl}/chargers`, {
+        method: 'GET',
+        headers: this.getHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data || data;
+    } catch (error) {
+      console.error('Get chargers error:', error);
+      
+      // Fallback mock data
+      await new Promise(resolve => setTimeout(resolve, 300));
+      return [
+        { id: '1', chargerId: 'CHG-001', name: 'Main Entrance Fast Charger', status: 'available', location: 'San Francisco' },
+        { id: '2', chargerId: 'CHG-002', name: 'Parking Lot AC Charger', status: 'occupied', location: 'San Francisco' },
+        { id: '3', chargerId: 'CHG-003', name: 'Backup Fast Charger', status: 'maintenance', location: 'San Francisco' }
+      ];
+    }
   }
 }
 

@@ -13,7 +13,7 @@ describe('AuthService', () => {
       const credentials: LoginCredentials = {
         identifier: 'admin001',
         password: 'admin123',
-        method: 'password',
+        loginMethod: 'username',
       };
 
       const response = await authService.login(credentials);
@@ -28,20 +28,20 @@ describe('AuthService', () => {
       const credentials: LoginCredentials = {
         identifier: 'invalid',
         password: 'wrong',
-        method: 'password',
+        loginMethod: 'username',
       };
 
       const response = await authService.login(credentials);
 
       expect(response.success).toBe(false);
-      expect(response.error).toBeDefined();
+      expect(response.errors).toBeDefined();
     });
 
     it('should handle email login', async () => {
       const credentials: LoginCredentials = {
         identifier: 'janakar.ganesan@gmail.com',
         password: 'admin123',
-        method: 'password',
+        loginMethod: 'email',
       };
 
       const response = await authService.login(credentials);
@@ -51,10 +51,10 @@ describe('AuthService', () => {
     });
   });
 
-  describe('sendOTP', () => {
+  describe('requestOTP', () => {
     it('should send OTP to valid phone number', async () => {
-      const response = await authService.sendOTP({
-        phone: '+1234567890',
+      const response = await authService.requestOTP({
+        identifier: '+1234567890',
         type: 'login',
       });
 
@@ -63,8 +63,8 @@ describe('AuthService', () => {
     });
 
     it('should send OTP to valid email', async () => {
-      const response = await authService.sendOTP({
-        email: 'janakar.ganesan@gmail.com',
+      const response = await authService.requestOTP({
+        identifier: 'janakar.ganesan@gmail.com',
         type: 'login',
       });
 
@@ -76,14 +76,14 @@ describe('AuthService', () => {
   describe('verifyOTP', () => {
     it('should verify correct OTP', async () => {
       // First send OTP
-      await authService.sendOTP({
-        phone: '+1234567890',
+      await authService.requestOTP({
+        identifier: '+1234567890',
         type: 'login',
       });
 
       // Then verify with correct OTP (123456 in mock)
       const response = await authService.verifyOTP({
-        phone: '+1234567890',
+        identifier: '+1234567890',
         otp: '123456',
         type: 'login',
       });
@@ -95,19 +95,19 @@ describe('AuthService', () => {
 
     it('should reject incorrect OTP', async () => {
       const response = await authService.verifyOTP({
-        phone: '+1234567890',
+        identifier: '+1234567890',
         otp: '000000',
         type: 'login',
       });
 
       expect(response.success).toBe(false);
-      expect(response.error).toBeDefined();
+      expect(response.errors).toBeDefined();
     });
 
     it('should reject expired OTP', async () => {
       // Simulate expired OTP scenario
       const response = await authService.verifyOTP({
-        phone: '+9999999999',
+        identifier: '+9999999999',
         otp: '123456',
         type: 'login',
       });
@@ -122,7 +122,7 @@ describe('AuthService', () => {
       const loginResponse = await authService.login({
         identifier: 'admin001',
         password: 'admin123',
-        method: 'password',
+        loginMethod: 'username',
       });
 
       const token = loginResponse.token!;
@@ -139,37 +139,20 @@ describe('AuthService', () => {
     });
   });
 
-  describe('forgotPassword', () => {
-    it('should send reset OTP to email', async () => {
-      const response = await authService.forgotPassword({
-        email: 'janakar.ganesan@gmail.com',
-      });
-
-      expect(response.success).toBe(true);
-      expect(response.message).toContain('sent');
-    });
-
-    it('should fail for non-existent email', async () => {
-      const response = await authService.forgotPassword({
-        email: 'nonexistent@example.com',
-      });
-
-      expect(response.success).toBe(false);
-    });
-  });
-
   describe('resetPassword', () => {
     it('should reset password with valid OTP', async () => {
       // First request password reset
-      await authService.forgotPassword({
-        email: 'janakar.ganesan@gmail.com',
+      await authService.requestOTP({
+        identifier: 'janakar.ganesan@gmail.com',
+        type: 'password_reset',
       });
 
       // Then reset with OTP
       const response = await authService.resetPassword({
-        email: 'janakar.ganesan@gmail.com',
+        identifier: 'janakar.ganesan@gmail.com',
         otp: '123456',
         newPassword: 'newPassword123',
+        confirmPassword: 'newPassword123',
       });
 
       expect(response.success).toBe(true);
@@ -177,9 +160,10 @@ describe('AuthService', () => {
 
     it('should fail with incorrect OTP', async () => {
       const response = await authService.resetPassword({
-        email: 'janakar.ganesan@gmail.com',
+        identifier: 'janakar.ganesan@gmail.com',
         otp: '000000',
         newPassword: 'newPassword123',
+        confirmPassword: 'newPassword123',
       });
 
       expect(response.success).toBe(false);
@@ -192,7 +176,7 @@ describe('AuthService', () => {
       const loginResponse = await authService.login({
         identifier: 'admin001',
         password: 'admin123',
-        method: 'password',
+        loginMethod: 'username',
       });
 
       const token = loginResponse.token!;
