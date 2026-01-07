@@ -20,6 +20,18 @@ next-env.d.ts
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
+
+# Build Logs & Artifacts
+*.log
+build*.log
+build*.txt
+build*.json
+final*.log
+tsconfig.tsbuildinfo
+
+# Test Setup Scripts
+RUN_FULL_TEST_SETUP.ps1
 
 # Environment
 .env

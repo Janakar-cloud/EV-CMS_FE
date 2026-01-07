@@ -1,4 +1,4 @@
-﻿ {
+﻿export interface Charger {
   id: string;
   name: string;
   location: {
@@ -84,7 +84,7 @@ export interface Vehicle {
   make: string;
   model: string;
   year: number;
-  batteryCapacity: number;h
+  batteryCapacity: number;
   connectorTypes: ConnectorType[];
   registrationNumber?: string;
   nickname?: string;
@@ -132,7 +132,7 @@ export interface ChargingSession {
   startTime: Date;
   endTime?: Date;
   status: SessionStatus;
-  energyConsumed: number;h
+  energyConsumed: number;
   duration: number;
   cost: number;
   currency: string;

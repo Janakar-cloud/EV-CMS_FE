@@ -139,7 +139,7 @@ export const TemperatureMonitoring: React.FC<TemperatureMonitoringProps> = ({ gu
     for (let i = 11; i >= 0; i--) {
       const time = new Date(now.getTime() - i * 10 * 60 * 1000); // 10-minute intervals
       const baseTemp = gunMetrics.thermalMetrics.connectorTemp;
-      const variance = Math.random() * 4 - 2; // Â±2Â°C variance
+      const variance = Math.random() * 4 - 2; // ±2°C variance
       
       data.push({
         time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -165,11 +165,11 @@ export const TemperatureMonitoring: React.FC<TemperatureMonitoringProps> = ({ gu
           />
           <YAxis 
             tick={{ fontSize: 10 }}
-            label={{ value: 'Temperature (Â°C)', angle: -90, position: 'insideLeft' }}
+            label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft' }}
           />
           <Tooltip 
             formatter={(value: number, name: string) => [
-              `${value.toFixed(1)}Â°C`, 
+              `${value.toFixed(1)}°C`, 
               name === 'temperature' ? 'Gun Temp' : 
               name === 'ambientTemp' ? 'Ambient' : 'Heat Load'
             ]}

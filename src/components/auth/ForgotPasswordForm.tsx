@@ -68,7 +68,7 @@ export default function ForgotPasswordForm({ onSuccess, onBack, onSwitchForm }: 
           </div>
           <h2 className="text-2xl font-bold text-gray-900">Forgot Password?</h2>
           <p className="text-gray-600 mt-2">
-            No worries! Enter your email address and we'll send you a reset code.
+            No worries! Enter your email address and we&apos;ll send you a reset code.
           </p>
         </div>
 
@@ -145,7 +145,7 @@ export default function ForgotPasswordForm({ onSuccess, onBack, onSwitchForm }: 
             <div className="text-xs text-blue-700">
               <p className="font-medium mb-1">Security Note:</p>
               <p>
-                We'll send a 6-digit verification code to your email. 
+                We&apos;ll send a 6-digit verification code to your email. 
                 The code will expire in 10 minutes for security reasons.
               </p>
             </div>

@@ -563,71 +563,117 @@ class GunMonitoringStorage {
 
 export const gunMonitoringStorage = new GunMonitoringStorage();
 
+// API client for real backend calls
+import { apiClient } from './api-client';
+
+const GUN_METRICS_BASE = '/chargers';
+
 export const gunMonitoringService = {
   getGunMetrics: async (gunId: string): Promise<GunMetricsResponse> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const metrics = gunMonitoringStorage.getGunMetrics(gunId);
-        if (metrics) {
-          resolve({
-            success: true,
-            metrics
-          });
-        } else {
-          resolve({
-            success: false,
-            error: 'Gun not found'
-          });
-        }
-      }, 200);
-    });
+    try {
+      // Try real API first
+      const response = await apiClient.get(`${GUN_METRICS_BASE}/guns/metrics`);
+      const data = response?.data ?? response;
+      const allMetrics = Array.isArray(data) ? data : (data?.metrics ?? []);
+      const metrics = allMetrics.find((m: any) => m.gunId === gunId);
+      
+      if (metrics) {
+        return { success: true, metrics: { ...metrics, fromApi: true } };
+      }
+      throw new Error('Gun not found in API response');
+    } catch (error) {
+      // Fallback to mock data
+      console.warn('Gun metrics API unavailable, using mock data');
+      const metrics = gunMonitoringStorage.getGunMetrics(gunId);
+      if (metrics) {
+        return { success: true, metrics };
+      }
+      return { success: false, error: 'Gun not found' };
+    }
   },
 
   getAllGunMetrics: async (): Promise<GunMetricsListResponse> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const metrics = gunMonitoringStorage.getAllGunMetrics();
-        resolve({
+    try {
+      // Try real API first: GET /api/v1/chargers/guns/metrics
+      const response = await apiClient.get(`${GUN_METRICS_BASE}/guns/metrics`);
+      const data = response?.data ?? response;
+      const metrics = Array.isArray(data) ? data : (data?.metrics ?? data?.data ?? []);
+      
+      if (metrics.length > 0) {
+        return {
           success: true,
-          metrics,
+          metrics: metrics.map((m: any) => ({ ...m, fromApi: true })),
           total: metrics.length
-        });
-      }, 300);
-    });
+        };
+      }
+      throw new Error('No metrics from API');
+    } catch (error) {
+      // Fallback to mock data
+      console.warn('Gun metrics API unavailable, using mock data');
+      const metrics = gunMonitoringStorage.getAllGunMetrics();
+      return { success: true, metrics, total: metrics.length };
+    }
   },
 
   getChargerGunMetrics: async (chargerId: string): Promise<GunMetricsListResponse> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const metrics = gunMonitoringStorage.getChargerGunMetrics(chargerId);
-        resolve({
+    try {
+      // Try real API first: GET /api/v1/chargers/:id/guns/metrics
+      const response = await apiClient.get(`${GUN_METRICS_BASE}/${chargerId}/guns/metrics`);
+      const data = response?.data ?? response;
+      const metrics = Array.isArray(data) ? data : (data?.metrics ?? data?.data ?? []);
+      
+      if (metrics.length > 0) {
+        return {
           success: true,
-          metrics,
+          metrics: metrics.map((m: any) => ({ ...m, fromApi: true })),
           total: metrics.length
-        });
-      }, 200);
-    });
+        };
+      }
+      throw new Error('No metrics from API');
+    } catch (error) {
+      // Fallback to mock data
+      console.warn(`Charger ${chargerId} gun metrics API unavailable, using mock data`);
+      const metrics = gunMonitoringStorage.getChargerGunMetrics(chargerId);
+      return { success: true, metrics, total: metrics.length };
+    }
   },
 
   filterGunMetrics: async (filters: GunMonitoringFilters): Promise<GunMetricsListResponse> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const metrics = gunMonitoringStorage.filterGunMetrics(filters);
-        resolve({
+    try {
+      // Try to get all metrics from API then filter locally
+      const response = await apiClient.get(`${GUN_METRICS_BASE}/guns/metrics`, { params: filters });
+      const data = response?.data ?? response;
+      const metrics = Array.isArray(data) ? data : (data?.metrics ?? data?.data ?? []);
+      
+      if (metrics.length > 0) {
+        return {
           success: true,
-          metrics,
+          metrics: metrics.map((m: any) => ({ ...m, fromApi: true })),
           total: metrics.length
-        });
-      }, 400);
-    });
+        };
+      }
+      throw new Error('No metrics from API');
+    } catch (error) {
+      // Fallback to mock data with local filtering
+      console.warn('Gun metrics filter API unavailable, using mock data');
+      const metrics = gunMonitoringStorage.filterGunMetrics(filters);
+      return { success: true, metrics, total: metrics.length };
+    }
   },
 
   executeCommand: async (command: ChargingCommand): Promise<ChargingCommandResponse> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(gunMonitoringStorage.executeCommand(command));
-      }, 500);
-    });
+    try {
+      // Try real API first
+      const response = await apiClient.post(`${GUN_METRICS_BASE}/${command.gunId}/command`, {
+        command: command.type,
+        parameters: command.parameters
+      });
+      return response?.data ?? response;
+    } catch (error) {
+      // Fallback to mock command execution
+      console.warn('Command API unavailable, using mock execution');
+      return gunMonitoringStorage.executeCommand(command);
+    }
   },
 
   startMonitoring: (gunId: string) => {

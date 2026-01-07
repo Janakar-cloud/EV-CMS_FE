@@ -59,17 +59,17 @@ export default function PricingRuleForm({ initial, onSave, onCancel }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="card p-4">
-          <h3 className="font-semibold text-gray-900 mb-3">Basics</h3>
+        <div className="bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 rounded-lg p-4">
+          <h3 className="font-bold text-white mb-3 text-lg">Basics</h3>
           <div className="space-y-3">
             <div>
-              <label className="label">Rule Name</label>
-              <input className="form-input w-full" value={name} onChange={e => setName(e.target.value)} required />
+              <label className="block text-sm font-semibold text-slate-300 mb-1">Rule Name</label>
+              <input className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={name} onChange={e => setName(e.target.value)} required />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label">Scope Level</label>
-                <select className="form-select w-full" value={scopeLevel} onChange={e => setScopeLevel(e.target.value as any)}>
+                <label className="block text-sm font-semibold text-slate-300 mb-1">Scope Level</label>
+                <select className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={scopeLevel} onChange={e => setScopeLevel(e.target.value as any)}>
                   <option value="global">Global</option>
                   <option value="site">Site</option>
                   <option value="charger">Charger</option>
@@ -78,15 +78,15 @@ export default function PricingRuleForm({ initial, onSave, onCancel }: Props) {
               </div>
               {scopeLevel !== 'global' && (
                 <div>
-                  <label className="label">Scope ID</label>
-                  <input className="form-input w-full" value={scopeId} onChange={e => setScopeId(e.target.value)} placeholder="e.g. SITE-001 or CHG-123/1" />
+                  <label className="block text-sm font-semibold text-slate-300 mb-1">Scope ID</label>
+                  <input className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={scopeId} onChange={e => setScopeId(e.target.value)} placeholder="e.g. SITE-001 or CHG-123/1" />
                 </div>
               )}
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label">Model</label>
-                <select className="form-select w-full" value={model} onChange={e => setModel(e.target.value as PricingModel)}>
+                <label className="block text-sm font-semibold text-slate-300 mb-1">Model</label>
+                <select className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={model} onChange={e => setModel(e.target.value as PricingModel)}>
                   <option value="static">Static</option>
                   <option value="slab">Slab</option>
                   <option value="hybrid">Hybrid (kWh + time)</option>
@@ -95,75 +95,75 @@ export default function PricingRuleForm({ initial, onSave, onCancel }: Props) {
                 </select>
               </div>
               <div>
-                <label className="label">GST %</label>
-                <input type="number" className="form-input w-full" value={gst} onChange={e => setGst(Number(e.target.value))} />
+                <label className="block text-sm font-semibold text-slate-300 mb-1">GST %</label>
+                <input type="number" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={gst} onChange={e => setGst(Number(e.target.value))} />
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="label">â‚¹/kWh</label>
-                <input type="number" className="form-input w-full" value={perKWh} onChange={e => setPerKWh(Number(e.target.value))} />
+                <label className="block text-sm font-semibold text-slate-300 mb-1">₹/kWh</label>
+                <input type="number" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={perKWh} onChange={e => setPerKWh(Number(e.target.value))} />
               </div>
               <div>
-                <label className="label">â‚¹/min</label>
-                <input type="number" className="form-input w-full" value={perMinute} onChange={e => setPerMinute(Number(e.target.value))} />
+                <label className="block text-sm font-semibold text-slate-300 mb-1">₹/min</label>
+                <input type="number" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={perMinute} onChange={e => setPerMinute(Number(e.target.value))} />
               </div>
               <div>
-                <label className="label">Min Bill â‚¹</label>
-                <input type="number" className="form-input w-full" value={minBill} onChange={e => setMinBill(Number(e.target.value))} />
+                <label className="block text-sm font-semibold text-slate-300 mb-1">Min Bill ₹</label>
+                <input type="number" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={minBill} onChange={e => setMinBill(Number(e.target.value))} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="card p-4">
-          <h3 className="font-semibold text-gray-900 mb-3">Validity</h3>
+        <div className="bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 rounded-lg p-4">
+          <h3 className="font-bold text-white mb-3 text-lg">Validity</h3>
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label">From</label>
-                <input type="datetime-local" className="form-input w-full" value={from.slice(0,16)} onChange={e => setFrom(new Date(e.target.value).toISOString())} />
+                <label className="block text-sm font-semibold text-slate-300 mb-1">From</label>
+                <input type="datetime-local" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={from.slice(0,16)} onChange={e => setFrom(new Date(e.target.value).toISOString())} />
               </div>
               <div>
-                <label className="label">To</label>
-                <input type="datetime-local" className="form-input w-full" value={to ? to.slice(0,16) : ''} onChange={e => setTo(e.target.value ? new Date(e.target.value).toISOString() : '')} />
+                <label className="block text-sm font-semibold text-slate-300 mb-1">To</label>
+                <input type="datetime-local" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={to ? to.slice(0,16) : ''} onChange={e => setTo(e.target.value ? new Date(e.target.value).toISOString() : '')} />
               </div>
             </div>
             <div>
-              <label className="label">Days</label>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Days</label>
               <div className="flex flex-wrap gap-2">
                 {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => (
-                  <button key={d} type="button" onClick={() => toggleDay(d)} className={`px-2 py-1 rounded border ${days.includes(d as any) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}>{d}</button>
+                  <button key={d} type="button" onClick={() => toggleDay(d)} className={`px-3 py-1 rounded border font-semibold transition ${days.includes(d as any) ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}>{d}</button>
                 ))}
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <input id="active" type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} />
-              <label htmlFor="active">Active</label>
+              <input id="active" type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} className="w-4 h-4 rounded accent-emerald-600" />
+              <label htmlFor="active" className="text-slate-300 font-semibold">Active</label>
             </div>
           </div>
         </div>
       </div>
 
       {(model === 'slab' || model === 'hybrid') && (
-        <div className="card p-4">
+        <div className="bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 rounded-lg p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-gray-900">Slabs</h3>
-            <button type="button" className="btn btn-sm btn-outline" onClick={addSlab}>Add Slab</button>
+            <h3 className="font-bold text-white text-lg">Slabs</h3>
+            <button type="button" className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-semibold text-sm" onClick={addSlab}>Add Slab</button>
           </div>
           <div className="space-y-2">
             {slabs.map((s, idx) => (
               <div key={idx} className="grid grid-cols-3 gap-3 items-end">
                 <div>
-                  <label className="label">Upto kWh (blank = âˆž)</label>
-                  <input className="form-input w-full" value={s.uptoKWh ?? ''} onChange={e => updateSlab(idx, 'uptoKWh', e.target.value)} />
+                  <label className="block text-sm font-semibold text-slate-300 mb-1">Upto kWh (blank = ∞)</label>
+                  <input className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={s.uptoKWh ?? ''} onChange={e => updateSlab(idx, 'uptoKWh', e.target.value)} />
                 </div>
                 <div>
-                  <label className="label">â‚¹/kWh</label>
-                  <input className="form-input w-full" value={s.perKWh} onChange={e => updateSlab(idx, 'perKWh', e.target.value)} />
+                  <label className="block text-sm font-semibold text-slate-300 mb-1">₹/kWh</label>
+                  <input className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={s.perKWh} onChange={e => updateSlab(idx, 'perKWh', e.target.value)} />
                 </div>
                 <div className="flex gap-2">
-                  <button type="button" className="btn btn-sm btn-outline" onClick={() => removeSlab(idx)}>Remove</button>
+                  <button type="button" className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded font-semibold text-sm" onClick={() => removeSlab(idx)}>Remove</button>
                 </div>
               </div>
             ))}
@@ -172,45 +172,45 @@ export default function PricingRuleForm({ initial, onSave, onCancel }: Props) {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="card p-4">
-          <h3 className="font-semibold text-gray-900 mb-3">Idle Fees</h3>
+        <div className="bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 rounded-lg p-4">
+          <h3 className="font-bold text-white mb-3 text-lg">Idle Fees</h3>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="label">Grace (min)</label>
-              <input type="number" className="form-input w-full" value={idleGrace} onChange={e => setIdleGrace(Number(e.target.value))} />
+              <label className="block text-sm font-semibold text-slate-300 mb-1">Grace (min)</label>
+              <input type="number" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={idleGrace} onChange={e => setIdleGrace(Number(e.target.value))} />
             </div>
             <div>
-              <label className="label">â‚¹/min</label>
-              <input type="number" className="form-input w-full" value={idlePerMin} onChange={e => setIdlePerMin(Number(e.target.value))} />
+              <label className="block text-sm font-semibold text-slate-300 mb-1">₹/min</label>
+              <input type="number" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={idlePerMin} onChange={e => setIdlePerMin(Number(e.target.value))} />
             </div>
             <div>
-              <label className="label">Cap / session</label>
-              <input type="number" className="form-input w-full" value={idleCap} onChange={e => setIdleCap(Number(e.target.value))} />
+              <label className="block text-sm font-semibold text-slate-300 mb-1">Cap / session</label>
+              <input type="number" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={idleCap} onChange={e => setIdleCap(Number(e.target.value))} />
             </div>
           </div>
         </div>
-        <div className="card p-4">
-          <h3 className="font-semibold text-gray-900 mb-3">Limits</h3>
+        <div className="bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 rounded-lg p-4">
+          <h3 className="font-bold text-white mb-3 text-lg">Limits</h3>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="label">Max minutes</label>
-              <input type="number" className="form-input w-full" value={maxMinutes} onChange={e => setMaxMinutes(Number(e.target.value))} />
+              <label className="block text-sm font-semibold text-slate-300 mb-1">Max minutes</label>
+              <input type="number" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={maxMinutes} onChange={e => setMaxMinutes(Number(e.target.value))} />
             </div>
             <div>
-              <label className="label">Max kWh</label>
-              <input type="number" className="form-input w-full" value={maxKWh} onChange={e => setMaxKWh(Number(e.target.value))} />
+              <label className="block text-sm font-semibold text-slate-300 mb-1">Max kWh</label>
+              <input type="number" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={maxKWh} onChange={e => setMaxKWh(Number(e.target.value))} />
             </div>
             <div>
-              <label className="label">Soft stop SoC %</label>
-              <input type="number" className="form-input w-full" value={softStopSoC} onChange={e => setSoftStopSoC(Number(e.target.value))} />
+              <label className="block text-sm font-semibold text-slate-300 mb-1">Soft stop SoC %</label>
+              <input type="number" className="w-full bg-white text-slate-900 border border-slate-500 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500" value={softStopSoC} onChange={e => setSoftStopSoC(Number(e.target.value))} />
             </div>
           </div>
         </div>
       </div>
 
       <div className="flex items-center justify-end gap-2">
-        {onCancel && <button type="button" className="btn btn-outline" onClick={onCancel}>Cancel</button>}
-        <button type="submit" className="btn btn-primary">Save Rule</button>
+        {onCancel && <button type="button" className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded font-semibold border border-slate-600" onClick={onCancel}>Cancel</button>}
+        <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-semibold">Save Rule</button>
       </div>
     </form>
   );

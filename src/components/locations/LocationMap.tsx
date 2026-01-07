@@ -4,165 +4,23 @@ import { Charger, MaintenanceAlert } from '@/types';
 import MapMarker from './MapMarker';
 import MapInfoWindow from './MapInfoWindow';
 
-export const mockChargers: Charger[] = [
-  {
-    id: '1',
-    name: 'Phoenix Mall - AC01',
-    location: {
-      latitude: 12.9716,
-      longitude: 77.5946,
-      address: 'Phoenix Mall, Whitefield',
-      city: 'Bangalore',
-      state: 'Karnataka',
-      zipCode: '560066',
-    },
-    status: 'available',
-    connectors: [
-      { id: '1-1', type: 'Type2', status: 'available', power: 22 },
-      { id: '1-2', type: 'Type2', status: 'occupied', power: 22 },
-    ],
-    power: 44,
-    brand: 'EV CMS',
-    model: 'AC-Dual-22',
-    serialNumber: 'EVCMS001',
-    firmwareVersion: '1.6.8',
-    lastSeen: new Date(),
-    uptime: 98.5,
-    utilization: 65.2,
-    revenue: {
-      today: 1850,
-      thisWeek: 12400,
-      thisMonth: 52300,
-      lifetime: 285000,
-    },
-    maintenance: {
-      lastMaintenance: new Date('2024-09-15'),
-      nextScheduled: new Date('2024-12-15'),
-      alerts: [],
-    },
-    ocppVersion: '1.6',
-    networkStatus: 'online',
-    temperature: 35,
-    loadManagement: {
-      currentLoad: 22,
-      maxLoad: 44,
-      inputPower: 44,
-      outputPower: 22,
-    },
-  },
-  {
-    id: '2',
-    name: 'Tech Park - DC01',
-    location: {
-      latitude: 12.9716,
-      longitude: 77.6046,
-      address: 'Tech Park, Whitefield',
-      city: 'Bangalore',
-      state: 'Karnataka',
-      zipCode: '560066',
-    },
-    status: 'occupied',
-    connectors: [
-      { id: '2-1', type: 'CCS2' as const, status: 'occupied', power: 50 },
-      { id: '2-2', type: 'CHAdeMO' as const, status: 'available', power: 50 },
-    ],
-    power: 100,
-    brand: 'EV CMS',
-    model: 'DC-Dual-50',
-    serialNumber: 'EVCMS002',
-    firmwareVersion: '1.6.8',
-    lastSeen: new Date(),
-    uptime: 97.8,
-    utilization: 78.3,
-    revenue: {
-      today: 3200,
-      thisWeek: 21500,
-      thisMonth: 89600,
-      lifetime: 485000,
-    },
-    maintenance: {
-      lastMaintenance: new Date('2024-08-20'),
-      nextScheduled: new Date('2024-11-20'),
-      alerts: [],
-    },
-    ocppVersion: '1.6',
-    networkStatus: 'online',
-    temperature: 42,
-    loadManagement: {
-      currentLoad: 50,
-      maxLoad: 100,
-      inputPower: 100,
-      outputPower: 50,
-    },
-  },
-  {
-    id: '3',
-    name: 'Highway Plaza - DC02',
-    location: {
-      latitude: 12.9816,
-      longitude: 77.5846,
-      address: 'Highway Plaza, Whitefield',
-      city: 'Bangalore',
-      state: 'Karnataka',
-      zipCode: '560066',
-    },
-    status: 'fault',
-    connectors: [
-      { id: '3-1', type: 'CCS2' as const, status: 'fault', power: 150 },
-      { id: '3-2', type: 'CCS2' as const, status: 'available', power: 150 },
-    ],
-    power: 300,
-    brand: 'EV CMS',
-    model: 'DC-Dual-150',
-    serialNumber: 'EVCMS003',
-    firmwareVersion: '1.6.8',
-    lastSeen: new Date(Date.now() - 3600000), // 1 hour ago
-    uptime: 85.2,
-    utilization: 45.7,
-    revenue: {
-      today: 890,
-      thisWeek: 15600,
-      thisMonth: 67200,
-      lifetime: 345000,
-    },
-    maintenance: {
-      lastMaintenance: new Date('2024-07-10'),
-      nextScheduled: new Date('2024-10-10'),
-      alerts: [{
-        id: 'alert-1',
-        type: 'hardware',
-        severity: 'high',
-        message: 'Connector 1 fault detected',
-        timestamp: new Date(),
-        resolved: false,
-      }],
-    },
-    ocppVersion: '1.6',
-    networkStatus: 'online',
-    temperature: 38,
-    loadManagement: {
-      currentLoad: 0,
-      maxLoad: 300,
-      inputPower: 300,
-      outputPower: 0,
-    },
-  },
-];
+// Mock data removed - LocationMap component should receive chargers as props
 
 interface LocationMapProps {
   className?: string;
   statusFilter?: string;
   powerTypeFilter?: string;
   searchQuery?: string;
+  chargers?: Charger[]; // Accept chargers as props from parent
 }
 
 const LocationMap: React.FC<LocationMapProps> = ({
   className = '',
   statusFilter = 'all',
   powerTypeFilter = 'all',
-  searchQuery = ''
+  searchQuery = '',
+  chargers = [] // Default to empty array
 }) => {
-  const [chargers] = useState<Charger[]>(mockChargers);
   const [selectedCharger, setSelectedCharger] = useState<Charger | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -270,7 +128,7 @@ const LocationMap: React.FC<LocationMapProps> = ({
                     <ol className="text-xs text-gray-600 list-decimal list-inside space-y-1">
                       <li>Go to <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Google Cloud Console</a></li>
                       <li>Create a new project or select existing one</li>
-                      <li>Enable the "Maps JavaScript API"</li>
+                      <li>Enable the &quot;Maps JavaScript API&quot;</li>
                       <li>Create credentials (API Key)</li>
                       <li>Add the key to your .env.local file as NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</li>
                     </ol>
@@ -345,7 +203,7 @@ const LocationMap: React.FC<LocationMapProps> = ({
                 <h4 className="text-sm font-medium text-blue-900 mb-2">To enable interactive map:</h4>
                 <ol className="text-xs text-blue-800 space-y-1 list-decimal list-inside">
                   <li>Get API key from <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600">Google Cloud Console</a></li>
-                  <li>Enable "Maps JavaScript API"</li>
+                  <li>Enable &quot;Maps JavaScript API&quot;</li>
                   <li>Update NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in .env.local</li>
                 </ol>
               </div>

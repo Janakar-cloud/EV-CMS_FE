@@ -25,7 +25,7 @@ export interface Limits {
 
 export interface SegmentAdjustment {
   segment: 'guest' | 'registered' | 'fleet' | 'employee' | 'resident';
-  kWhDiscount?: number;/kWh discount
+  kWhDiscount?: number; // kWh discount
   percentageDiscount?: number;
 }
 

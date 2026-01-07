@@ -150,32 +150,32 @@ export default function AddUserForm({ onUserAdded, onCancel }: AddUserFormProps)
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg shadow-lg border border-slate-600 p-6">
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Add New User</h2>
-        <p className="mt-1 text-sm text-gray-600">
+        <h2 className="text-2xl font-bold text-white">Add New User</h2>
+        <p className="mt-1 text-sm text-slate-300">
           Create a new user account. All fields are required and email/phone must be unique.
         </p>
       </div>
 
       {submitStatus === 'success' && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
-          <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
-          <span className="text-green-700">User created successfully!</span>
+        <div className="mb-6 p-4 bg-green-900/30 border border-green-700 rounded-lg flex items-center">
+          <CheckCircleIcon className="h-5 w-5 text-green-400 mr-2" />
+          <span className="text-green-300">User created successfully!</span>
         </div>
       )}
 
       {submitStatus === 'error' && errors.general && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
-          <ExclamationTriangleIcon className="h-5 w-5 text-red-500 mr-2" />
-          <span className="text-red-700">{errors.general}</span>
+        <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg flex items-center">
+          <ExclamationTriangleIcon className="h-5 w-5 text-red-400 mr-2" />
+          <span className="text-red-300">{errors.general}</span>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* User ID Field */}
         <div>
-          <label htmlFor="userid" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="userid" className="block text-sm font-medium text-white mb-2">
             User ID *
           </label>
           <div className="mt-1 relative">
@@ -185,8 +185,8 @@ export default function AddUserForm({ onUserAdded, onCancel }: AddUserFormProps)
               id="userid"
               value={formData.userid}
               onChange={handleInputChange}
-              className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.userid ? 'border-red-300' : 'border-gray-300'
+              className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-900 placeholder-slate-400 ${
+                errors.userid ? 'border-red-500' : 'border-slate-400'
               }`}
               placeholder="Enter unique user ID (min 3 characters)"
               disabled={isSubmitting}
@@ -196,16 +196,16 @@ export default function AddUserForm({ onUserAdded, onCancel }: AddUserFormProps)
             </div>
           </div>
           {errors.userid && (
-            <p className="mt-1 text-sm text-red-600">{errors.userid}</p>
+            <p className="mt-1 text-sm text-red-400">{errors.userid}</p>
           )}
           {userIdStatus === 'available' && !errors.userid && (
-            <p className="mt-1 text-sm text-green-600">User ID is available</p>
+            <p className="mt-1 text-sm text-green-400">User ID is available</p>
           )}
         </div>
 
         {/* Full Name Field */}
         <div>
-          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="fullName" className="block text-sm font-medium text-white mb-2">
             Full Name *
           </label>
           <input
@@ -214,20 +214,20 @@ export default function AddUserForm({ onUserAdded, onCancel }: AddUserFormProps)
             id="fullName"
             value={formData.fullName}
             onChange={handleInputChange}
-            className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.fullName ? 'border-red-300' : 'border-gray-300'
+            className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-900 placeholder-slate-400 ${
+              errors.fullName ? 'border-red-500' : 'border-slate-400'
             }`}
             placeholder="Enter full name"
             disabled={isSubmitting}
           />
           {errors.fullName && (
-            <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
+            <p className="mt-1 text-sm text-red-400">{errors.fullName}</p>
           )}
         </div>
 
         {/* Email Field */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
             Email Address *
           </label>
           <input
@@ -236,20 +236,20 @@ export default function AddUserForm({ onUserAdded, onCancel }: AddUserFormProps)
             id="email"
             value={formData.email}
             onChange={handleInputChange}
-            className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.email ? 'border-red-300' : 'border-gray-300'
+            className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-900 placeholder-slate-400 ${
+              errors.email ? 'border-red-500' : 'border-slate-400'
             }`}
             placeholder="Enter email address"
             disabled={isSubmitting}
           />
           {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            <p className="mt-1 text-sm text-red-400">{errors.email}</p>
           )}
         </div>
 
         {/* Phone Field */}
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="phone" className="block text-sm font-medium text-white mb-2">
             Phone Number *
           </label>
           <input
@@ -258,24 +258,24 @@ export default function AddUserForm({ onUserAdded, onCancel }: AddUserFormProps)
             id="phone"
             value={formData.phone}
             onChange={handleInputChange}
-            className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              errors.phone ? 'border-red-300' : 'border-gray-300'
+            className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white text-slate-900 placeholder-slate-400 ${
+              errors.phone ? 'border-red-500' : 'border-slate-400'
             }`}
             placeholder="Enter phone number (+1234567890)"
             disabled={isSubmitting}
           />
           {errors.phone && (
-            <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            <p className="mt-1 text-sm text-red-400">{errors.phone}</p>
           )}
         </div>
 
         {/* Form Actions */}
-        <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+        <div className="flex justify-end space-x-3 pt-6 border-t border-slate-600">
           {onCancel && (
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-slate-500 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               disabled={isSubmitting}
             >
               Cancel
@@ -284,10 +284,10 @@ export default function AddUserForm({ onUserAdded, onCancel }: AddUserFormProps)
           <button
             type="submit"
             disabled={isSubmitting || userIdStatus === 'taken'}
-            className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
               isSubmitting || userIdStatus === 'taken'
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700'
+                ? 'bg-slate-600 cursor-not-allowed opacity-50'
+                : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >
             {isSubmitting ? 'Creating User...' : 'Create User'}

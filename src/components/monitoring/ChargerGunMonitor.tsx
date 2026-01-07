@@ -202,9 +202,9 @@ export const ChargerGunMonitor: React.FC<ChargerGunMonitorProps> = ({
             </h2>
             <div className="flex items-center space-x-4 text-sm text-gray-500 mt-1">
               <span>Charger: {gunMetrics.chargerId}</span>
-              <span>â€¢</span>
+              <span>•</span>
               <span>Station: {gunMetrics.stationId}</span>
-              <span>â€¢</span>
+              <span>•</span>
               <span>Connector: {gunMetrics.connectorId}</span>
             </div>
           </div>
@@ -306,7 +306,7 @@ export const ChargerGunMonitor: React.FC<ChargerGunMonitorProps> = ({
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="text-sm text-gray-500">Power Module Temp</div>
                 <div className="text-2xl font-bold text-orange-600">
-                  {gunMetrics.thermalMetrics.powerModuleTemp.toFixed(1)}Â°C
+                  {gunMetrics.thermalMetrics.powerModuleTemp.toFixed(1)}°C
                 </div>
               </div>
               
@@ -337,7 +337,7 @@ export const ChargerGunMonitor: React.FC<ChargerGunMonitorProps> = ({
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="text-sm text-gray-500">Connector Temp</div>
                 <div className="text-lg font-semibold text-blue-600">
-                  {gunMetrics.thermalMetrics.connectorTemp.toFixed(1)}Â°C
+                  {gunMetrics.thermalMetrics.connectorTemp.toFixed(1)}°C
                 </div>
               </div>
               
@@ -367,7 +367,7 @@ export const ChargerGunMonitor: React.FC<ChargerGunMonitorProps> = ({
                 </div>
                 {gunMetrics.activeSession.currentBatteryLevel && (
                   <div className="text-sm text-gray-500">
-                    Battery: {gunMetrics.activeSession.currentBatteryLevel}% â†’ {gunMetrics.activeSession.targetBatteryLevel}%
+                    Battery: {gunMetrics.activeSession.currentBatteryLevel}% → {gunMetrics.activeSession.targetBatteryLevel}%
                   </div>
                 )}
               </div>
@@ -385,10 +385,10 @@ export const ChargerGunMonitor: React.FC<ChargerGunMonitorProps> = ({
               <div>
                 <div className="text-sm text-gray-600">Session Cost</div>
                 <div className="font-semibold text-gray-900">
-                  â‚¹{gunMetrics.activeSession.currentSessionCost.toFixed(2)}
+                  ₹{gunMetrics.activeSession.currentSessionCost.toFixed(2)}
                 </div>
                 <div className="text-sm text-gray-500">
-                  Rate: â‚¹{gunMetrics.activeSession.costPerKwh}/kWh
+                  Rate: ₹{gunMetrics.activeSession.costPerKwh}/kWh
                 </div>
               </div>
             </div>
@@ -420,7 +420,7 @@ export const ChargerGunMonitor: React.FC<ChargerGunMonitorProps> = ({
                 <div>
                   <div className="text-sm text-gray-600">Estimated Cost</div>
                   <div className="text-lg font-semibold text-gray-700">
-                    â‚¹{gunMetrics.estimates.estimatedCostToComplete?.toFixed(2) || '0.00'}
+                    ₹{gunMetrics.estimates.estimatedCostToComplete?.toFixed(2) || '0.00'}
                   </div>
                 </div>
               </div>

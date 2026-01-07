@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import VehicleList from '@/components/vehicles/VehicleList';
-import { mockVehicles } from '@/components/vehicles/VehicleList';
+import { mockVehicles } from '@/components/vehicles/mockData';
 
 export default function VehiclesPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,8 +32,8 @@ export default function VehiclesPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Vehicle Inventory</h1>
-            <p className="text-gray-600">Manage and monitor customer electric vehicles</p>
+            <h1 className="text-3xl font-bold text-white">Vehicle Inventory</h1>
+            <p className="text-slate-300">Manage and monitor customer electric vehicles</p>
           </div>
           <div className="flex items-center space-x-3">
             <button className="btn btn-outline">
@@ -53,70 +53,70 @@ export default function VehiclesPage() {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="card p-4">
+          <div className="card p-4 bg-gradient-to-br from-blue-600 to-blue-700 border border-blue-500">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Vehicles</p>
-                <p className="text-2xl font-bold text-gray-900">{mockVehicles.length}</p>
+                <p className="text-sm font-bold text-blue-100">Total Vehicles</p>
+                <p className="text-2xl font-bold text-white">{mockVehicles.length}</p>
               </div>
             </div>
           </div>
 
-          <div className="card p-4">
+          <div className="card p-4 bg-gradient-to-br from-green-600 to-green-700 border border-green-500">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Avg Battery</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm font-bold text-green-100">Avg Battery</p>
+                <p className="text-2xl font-bold text-white">
                   {Math.round(mockVehicles.reduce((sum, v) => sum + v.batteryCapacity, 0) / mockVehicles.length)}kWh
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="card p-4">
+          <div className="card p-4 bg-gradient-to-br from-purple-600 to-purple-700 border border-purple-500">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">DC Fast Charge</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm font-bold text-purple-100">DC Fast Charge</p>
+                <p className="text-2xl font-bold text-white">
                   {mockVehicles.filter(v => v.connectorTypes.includes('CCS2') || v.connectorTypes.includes('CHAdeMO')).length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="card p-4">
+          <div className="card p-4 bg-gradient-to-br from-amber-600 to-amber-700 border border-amber-500">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">AC Charge Only</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm font-bold text-amber-100">AC Charge Only</p>
+                <p className="text-2xl font-bold text-white">
                   {mockVehicles.filter(v => !v.connectorTypes.includes('CCS2') && !v.connectorTypes.includes('CHAdeMO')).length}
                 </p>
               </div>
@@ -125,23 +125,23 @@ export default function VehiclesPage() {
         </div>
 
         {/* Filters */}
-        <div className="card p-4">
+        <div className="card p-4 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600">
           <div className="flex flex-col lg:flex-row lg:flex-wrap items-start lg:items-center gap-4">
             <div className="flex items-center space-x-2 w-full sm:w-auto">
-              <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Search:</label>
+              <label className="text-sm font-bold text-white whitespace-nowrap">Search:</label>
               <input
                 type="text"
                 placeholder="Search by make, model, owner..."
-                className="form-input text-sm flex-1 sm:w-64"
+                className="form-input text-sm flex-1 sm:w-64 bg-slate-600 border-slate-500 text-white placeholder-slate-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
             <div className="flex items-center space-x-2 w-full sm:w-auto">
-              <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Make:</label>
+              <label className="text-sm font-bold text-white whitespace-nowrap">Make:</label>
               <select
-                className="form-select text-sm flex-1 sm:w-auto"
+                className="form-select text-sm flex-1 sm:w-auto bg-slate-600 border-slate-500 text-white"
                 value={makeFilter}
                 onChange={(e) => setMakeFilter(e.target.value)}
               >
@@ -153,9 +153,9 @@ export default function VehiclesPage() {
             </div>
 
             <div className="flex items-center space-x-2 w-full sm:w-auto">
-              <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Connector:</label>
+              <label className="text-sm font-bold text-white whitespace-nowrap">Connector:</label>
               <select
-                className="form-select text-sm flex-1 sm:w-auto"
+                className="form-select text-sm flex-1 sm:w-auto bg-slate-600 border-slate-500 text-white"
                 value={connectorFilter}
                 onChange={(e) => setConnectorFilter(e.target.value)}
               >
@@ -183,8 +183,8 @@ export default function VehiclesPage() {
         </div>
 
         {/* Summary */}
-        <div className="text-sm text-gray-600 text-center">
-          Showing {filteredVehicles.length} of {mockVehicles.length} vehicles
+        <div className="text-sm font-semibold text-center text-slate-200 bg-slate-700/50 border border-slate-600 rounded-lg py-3">
+          Showing <span className="text-emerald-400">{filteredVehicles.length}</span> of <span className="text-emerald-400">{mockVehicles.length}</span> vehicles
         </div>
       </div>
     </Layout>

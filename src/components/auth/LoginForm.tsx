@@ -86,6 +86,9 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
             errorMap[error.field] = error.message;
           });
         }
+        if (!Object.keys(errorMap).length) {
+          errorMap.general = response.message || 'Login failed. Please try again.';
+        }
         setErrors(errorMap);
       }
     } catch (error) {
@@ -281,7 +284,7 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
         <div className="mt-6 p-4 bg-gray-50 rounded-md">
           <p className="text-xs font-medium text-gray-700 mb-2">Demo Credentials:</p>
           <div className="text-xs text-gray-600 space-y-1">
-            <div><span className="font-medium">Admin:</span> admin001 / admin123</div>
+            <div><span className="font-medium">Admin:</span> admin@evcms.com / password123</div>
             <div><span className="font-medium">Franchise:</span> franchise001 / franchise123</div>
             <div><span className="font-medium">Partner:</span> partner001 / partner123</div>
           </div>

@@ -9,10 +9,10 @@ export default function ChargerMonitoringPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-slate-400">Loading...</p>
         </div>
       </div>
     );
@@ -20,7 +20,7 @@ export default function ChargerMonitoringPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -30,7 +30,7 @@ export default function ChargerMonitoringPage() {
     <Layout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Live Gun Monitoring</h1>
+          <h1 className="text-2xl font-bold text-slate-100">Live Gun Monitoring</h1>
           <div className="flex space-x-3">
             <button className="btn btn-secondary">
               Export Data

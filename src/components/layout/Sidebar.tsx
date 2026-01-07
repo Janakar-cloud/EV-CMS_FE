@@ -16,6 +16,10 @@ import {
   UsersIcon,
   BuildingOfficeIcon,
   ExclamationTriangleIcon,
+  MapPinIcon,
+  CalendarIcon,
+  CreditCardIcon,
+  FolderIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -30,6 +34,26 @@ const navigation = [
       { name: 'Maintenance', href: '/chargers/maintenance' },
       { name: 'Add New Charger', href: '/chargers/add' },
     ]
+  },
+  {
+    name: 'Charging Stations',
+    href: '/stations',
+    icon: MapPinIcon,
+  },
+  {
+    name: 'Bookings',
+    href: '/bookings',
+    icon: CalendarIcon,
+  },
+  {
+    name: 'Payments & Wallet',
+    href: '/payments',
+    icon: CreditCardIcon,
+  },
+  {
+    name: 'Admin Dashboard',
+    href: '/admin',
+    icon: FolderIcon,
   },
   {
     name: 'Location Map',
@@ -152,13 +176,13 @@ export default function Sidebar() {
 
   return (
     <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
-      <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4">
+      <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-950/90 px-6 pb-4 shadow-2xl">
         <div className="flex h-16 shrink-0 items-center">
-          <BoltIcon className="h-8 w-8 text-primary-400" />
-          <span className="ml-2 text-xl font-bold text-white">EV CMS</span>
+          <BoltIcon className="h-8 w-8 text-emerald-400" />
+          <span className="ml-2 text-xl font-bold text-white">VoltGrid Admin</span>
         </div>
         <nav className="flex flex-1 flex-col">
-          <ul role="list" className="flex flex-1 flex-col gap-y-7">
+          <ul role="list" className="flex flex-1 flex-col gap-y-3">
             <li>
               <ul role="list" className="-mx-2 space-y-1">
                 {navigation.map((item) => (
@@ -168,16 +192,16 @@ export default function Sidebar() {
                         href={item.href}
                         className={classNames(
                           isCurrentPath(item.href)
-                            ? 'bg-gray-800 text-white'
-                            : 'text-gray-400 hover:text-white hover:bg-gray-800',
-                          'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
+                            ? 'bg-slate-800 shadow-lg shadow-emerald-500/40 text-white'
+                            : 'text-slate-300 hover:text-white hover:bg-slate-900/80',
+                          'group flex gap-x-3 rounded-2xl p-2 text-sm leading-6 font-semibold'
                         )}
                       >
                         <item.icon
                           className={classNames(
                             isCurrentPath(item.href)
-                              ? 'text-white'
-                              : 'text-gray-400 group-hover:text-white',
+                              ? 'text-emerald-300'
+                              : 'text-slate-400 group-hover:text-white',
                             'h-6 w-6 shrink-0'
                           )}
                           aria-hidden="true"
@@ -190,16 +214,16 @@ export default function Sidebar() {
                           onClick={() => toggleExpanded(item.name)}
                           className={classNames(
                             isCurrentPath(item.href)
-                              ? 'bg-gray-800 text-white'
-                              : 'text-gray-400 hover:text-white hover:bg-gray-800',
-                            'group flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
+                              ? 'bg-slate-800 text-white'
+                              : 'text-slate-300 hover:text-white hover:bg-slate-900/70',
+                            'group flex w-full gap-x-3 rounded-2xl p-2 text-sm leading-6 font-semibold'
                           )}
                         >
                           <item.icon
                             className={classNames(
                               isCurrentPath(item.href)
-                                ? 'text-white'
-                                : 'text-gray-400 group-hover:text-white',
+                                ? 'text-emerald-300'
+                                : 'text-slate-400 group-hover:text-white',
                               'h-6 w-6 shrink-0'
                             )}
                             aria-hidden="true"
@@ -207,7 +231,7 @@ export default function Sidebar() {
                           <span className="flex-1 text-left">{item.name}</span>
                           <svg
                             className={classNames(
-                              expandedItems.includes(item.name) ? 'rotate-90' : '',
+                              expandedItems.includes(item.name) ? 'rotate-90 text-emerald-400' : 'text-slate-400',
                               'ml-auto h-5 w-5 transition-transform'
                             )}
                             viewBox="0 0 20 20"
@@ -228,9 +252,9 @@ export default function Sidebar() {
                                   href={child.href}
                                   className={classNames(
                                     isCurrentPath(child.href)
-                                      ? 'bg-gray-800 text-white'
-                                      : 'text-gray-400 hover:text-white hover:bg-gray-800',
-                                    'block rounded-md py-2 px-3 text-sm leading-6'
+                                      ? 'bg-slate-800 text-white'
+                                      : 'text-slate-300 hover:text-white hover:bg-slate-900/70',
+                                    'block rounded-2xl py-2 px-3 text-sm leading-6'
                                   )}
                                 >
                                   {child.name}

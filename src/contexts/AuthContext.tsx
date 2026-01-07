@@ -18,6 +18,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+export { AuthContext };
+
 interface AuthProviderProps {
   children: ReactNode;
 }
@@ -31,7 +33,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const isAuthenticated = !!(user && token);
 
-  const publicRoutes = [APP_ROUTES.LOGIN];
+  const publicRoutes: string[] = [APP_ROUTES.LOGIN];
   const isPublicRoute = publicRoutes.includes(pathname);
 
   const login = (newToken: string, newUser: AuthUser) => {
@@ -47,7 +49,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = async () => {
     if (token) {
       try {
-        await authService.logout(token);
+        await authService.logout();
       } catch (error) {
         console.error('Logout error:', error);
       }
@@ -61,7 +63,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Clear cookie
     document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     
-    router.push(APP_ROUTES.LOGIN);
+    router.push(APP_ROUTES.LOGIN as string);
   };
 
   const refreshAuth = useCallback(async () => {

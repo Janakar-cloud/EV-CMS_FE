@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { toast } from 'sonner';
 import { API_CONFIG, STORAGE_KEYS, ERROR_MESSAGES } from '@/config/constants';
+import { captureException, addBreadcrumb } from './error-tracking';
 
 class ApiClient {
   private instance: AxiosInstance;
@@ -29,6 +30,7 @@ class ApiClient {
           }
         }
 
+        addBreadcrumb(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
         return config;
       },
       (error) => {
@@ -51,6 +53,9 @@ class ApiClient {
   private handleError(error: AxiosError) {
     if (!error.response) {
       // Network error
+      captureException(new Error('Network error: ' + error.message), {
+        type: 'network_error',
+      });
       toast.error('Network Error', {
         description: ERROR_MESSAGES.NETWORK_ERROR,
       });
@@ -59,6 +64,13 @@ class ApiClient {
 
     const status = error.response.status;
     const data = error.response.data as any;
+
+    // Track all errors in Sentry
+    captureException(error, {
+      status,
+      url: error.config?.url,
+      message: data?.message,
+    });
 
     switch (status) {
       case 400:

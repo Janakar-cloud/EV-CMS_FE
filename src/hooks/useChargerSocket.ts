@@ -10,7 +10,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:5000';
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
 
 interface ChargerStatusUpdate {
   chargerId: string;
@@ -40,6 +40,25 @@ interface NotificationEvent {
   timestamp: string;
 }
 
+function toChargerStatus(value: unknown): ChargerStatusUpdate['status'] {
+  const normalized = String(value ?? '').toLowerCase();
+  if (normalized === 'available') return 'available';
+  if (normalized === 'occupied') return 'occupied';
+  if (normalized === 'faulted') return 'faulted';
+  if (normalized === 'offline') return 'offline';
+  if (normalized === 'maintenance') return 'maintenance';
+  return 'available';
+}
+
+function toNotificationType(value: unknown): NotificationEvent['type'] {
+  const normalized = String(value ?? '').toLowerCase();
+  if (normalized === 'info') return 'info';
+  if (normalized === 'warning') return 'warning';
+  if (normalized === 'error') return 'error';
+  if (normalized === 'success') return 'success';
+  return 'info';
+}
+
 export function useChargerSocket() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -48,7 +67,7 @@ export function useChargerSocket() {
 
   useEffect(() => {
     // Get authentication token
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
     
     if (!token) {
       console.warn('No auth token found. Socket.IO connection requires authentication.');
@@ -83,6 +102,18 @@ export function useChargerSocket() {
     socketInstance.on('charger:status', (data: ChargerStatusUpdate) => {
       console.log('📡 Charger status update:', data);
       setChargerUpdates(prev => [data, ...prev.slice(0, 99)]); // Keep last 100
+    });
+
+    // Contract: station updates (use same local list for UI)
+    socketInstance.on('station:update', (data: any) => {
+      console.log('📡 Station update:', data);
+      const mapped: ChargerStatusUpdate = {
+        chargerId: String(data?.chargerId ?? data?.evseId ?? data?.stationId ?? ''),
+        status: toChargerStatus(data?.status),
+        connectors: data?.connectors,
+        timestamp: String(data?.timestamp ?? new Date().toISOString()),
+      };
+      setChargerUpdates(prev => [mapped, ...prev.slice(0, 99)]);
     });
 
     // Listen for charger connected/disconnected events
@@ -120,8 +151,8 @@ export function useChargerSocket() {
       }, ...prev.slice(0, 49)]);
     });
 
-    socketInstance.on('session:update', (data: ChargingSessionUpdate) => {
-      console.log('⚡ Charging session update:', data);
+    socketInstance.on('session:update', (data: unknown) => {
+      console.log('⚡ Session update:', data);
     });
 
     socketInstance.on('session:completed', (data: ChargingSessionUpdate) => {
@@ -139,6 +170,19 @@ export function useChargerSocket() {
     socketInstance.on('notification:new', (data: NotificationEvent) => {
       console.log('🔔 New notification:', data);
       setNotifications(prev => [data, ...prev.slice(0, 49)]);
+    });
+
+    // Contract: notification
+    socketInstance.on('notification', (data: any) => {
+      console.log('🔔 Notification:', data);
+      const mapped: NotificationEvent = {
+        id: String(data?.id ?? `${Date.now()}-notification`),
+        type: toNotificationType(data?.type),
+        message: String(data?.message ?? ''),
+        chargerId: data?.chargerId,
+        timestamp: String(data?.timestamp ?? new Date().toISOString()),
+      };
+      setNotifications(prev => [mapped, ...prev.slice(0, 49)]);
     });
 
     setSocket(socketInstance);

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { withSecurityHeaders } from '@/lib/security';
 
 // Define public routes that don't require authentication
 const publicRoutes = ['/login', '/forgot-password', '/reset-password'];
@@ -12,7 +13,8 @@ export function middleware(request: NextRequest) {
 
   // Allow API routes to pass through
   if (apiRoutes.some(route => pathname.startsWith(route))) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    return withSecurityHeaders(response);
   }
 
   // Check if the route is public

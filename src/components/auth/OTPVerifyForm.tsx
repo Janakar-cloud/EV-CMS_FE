@@ -120,8 +120,8 @@ export default function OTPVerifyForm({
           onSwitchForm?.('reset_password', { identifier, otp: otpString });
         }
       } else {
-        if (response.errors && response.errors.length > 0) {
-          setError(response.errors[0].message);
+        if (response.errors?.length) {
+          setError(response.errors[0]?.message || 'Invalid OTP. Please try again.');
         } else {
           setError('Invalid OTP. Please try again.');
         }
@@ -235,7 +235,7 @@ export default function OTPVerifyForm({
               </button>
             ) : (
               <p className="text-sm text-gray-500">
-                Didn't receive the code? You can request a new one in {formatTime(Math.max(timeLeft, 0))}
+                Didn&apos;t receive the code? You can request a new one in {formatTime(Math.max(timeLeft, 0))}
               </p>
             )}
           </div>

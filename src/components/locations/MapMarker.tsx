@@ -26,7 +26,7 @@ const MapMarker: React.FC<MapMarkerProps> = ({ map, charger, onClick, isSelected
           <svg width="${baseSize}" height="${baseSize}" viewBox="0 0 ${baseSize} ${baseSize}" xmlns="http://www.w3.org/2000/svg">
             <circle cx="${baseSize/2}" cy="${baseSize/2}" r="${baseSize/2 - 2}" fill="${color}" stroke="white" stroke-width="2"/>
             <text x="${baseSize/2}" y="${baseSize/2 + 1}" text-anchor="middle" fill="white" font-size="${baseSize/3}" font-weight="bold">
-              ${isDC ? 'âš¡' : 'ðŸ”Œ'}
+              ${isDC ? '⚡' : '🔌'}
             </text>
           </svg>
         `;
@@ -62,17 +62,16 @@ const MapMarker: React.FC<MapMarkerProps> = ({ map, charger, onClick, isSelected
   }, [map, charger, onClick]);
 
   useEffect(() => {
-    if (markerRef.current) {
-      if (isSelected) {
-        markerRef.current.setAnimation(google.maps.Animation.BOUNCE);
-        setTimeout(() => {
-          if (markerRef.current) {
-            markerRef.current.setAnimation(null);
-          }
-        }, 2000);
-      } else {
-        markerRef.current.setAnimation(null);
-      }
+    if (markerRef.current && isSelected) {
+      markerRef.current.setAnimation(google.maps.Animation.BOUNCE);
+      const timer = setTimeout(() => {
+        if (markerRef.current) {
+          markerRef.current.setAnimation(null);
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
+    } else if (markerRef.current) {
+      markerRef.current.setAnimation(null);
     }
   }, [isSelected]);
 

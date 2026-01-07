@@ -5,25 +5,21 @@ import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/layout/Layout';
 import { ChargerMonitoringPage } from '@/components/monitoring/ChargerMonitoringPage';
 
-interface MonitoringPageProps {
-  params: {
-    id?: string;
-  };
-  searchParams: {
-    chargerId?: string;
-    stationId?: string;
-  };
-}
-
-export default function MonitoringPage({ params, searchParams }: MonitoringPageProps) {
+export default function MonitoringPage({ 
+  searchParams = {} 
+}: { 
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
   const { isLoading, isAuthenticated } = useAuth();
+  const chargerId = typeof searchParams.chargerId === 'string' ? searchParams.chargerId : undefined;
+  const stationId = typeof searchParams.stationId === 'string' ? searchParams.stationId : undefined;
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-400 mx-auto mb-4"></div>
+          <p className="text-slate-300">Loading...</p>
         </div>
       </div>
     );
@@ -31,8 +27,8 @@ export default function MonitoringPage({ params, searchParams }: MonitoringPageP
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-400"></div>
       </div>
     );
   }
@@ -40,8 +36,8 @@ export default function MonitoringPage({ params, searchParams }: MonitoringPageP
   return (
     <Layout>
       <ChargerMonitoringPage
-        chargerId={searchParams.chargerId || params.id}
-        stationId={searchParams.stationId}
+        chargerId={chargerId}
+        stationId={stationId}
       />
     </Layout>
   );

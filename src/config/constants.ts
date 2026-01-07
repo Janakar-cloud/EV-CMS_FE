@@ -22,7 +22,7 @@ export const API_ENDPOINTS = {
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
     CHECK_AUTH: '/auth/check',
-    REFRESH_TOKEN: '/auth/refresh',
+    REFRESH_TOKEN: '/auth/refresh-token',
   },
   
   // Users
@@ -77,12 +77,19 @@ export const API_ENDPOINTS = {
     HISTORY: '/sessions/history',
   },
   
-  // Analytics
+  // Analytics - NOTE: Uses /api/analytics (NOT /api/v1/analytics)
   ANALYTICS: {
-    DASHBOARD: '/analytics/dashboard',
-    REVENUE: '/analytics/revenue',
-    UTILIZATION: '/analytics/utilization',
-    USERS: '/analytics/users',
+    // These are relative to /api/analytics, not /api/v1
+    BASE: '/api/analytics',
+    DASHBOARD: '/api/analytics/dashboard',
+    REVENUE: '/api/analytics/revenue',
+    CHARGER_STATS: '/api/analytics/charger-stats',
+    SESSION_SUMMARY: '/api/analytics/session-summary',
+    USER_ACTIVITY: '/api/analytics/user-activity',
+    PEAK_HOURS: '/api/analytics/peak-hours',
+    COMPLIANCE_REPORT: '/api/analytics/compliance-report', // admin only
+    UTILIZATION: '/api/analytics/utilization',
+    USERS: '/api/analytics/users',
   },
   
   // Franchises
@@ -93,11 +100,17 @@ export const API_ENDPOINTS = {
     PERFORMANCE: '/franchises/performance',
   },
   
-  // Partners
+  // Partners - NOTE: Uses /api/partners (NOT /api/v1/partners)
   PARTNERS: {
-    BASE: '/partners',
-    BY_ID: (id: string) => `/partners/${id}`,
-    ONBOARDING: '/partners/onboarding',
+    // These are relative to /api/partners, not /api/v1
+    BASE: '/api/partners',
+    BY_ID: (id: string) => `/api/partners/${id}`,
+    APPROVE: (id: string) => `/api/partners/${id}/approve`,
+    REJECT: (id: string) => `/api/partners/${id}/reject`,
+    REVOKE: (id: string) => `/api/partners/${id}/revoke`,
+    REACTIVATE: (id: string) => `/api/partners/${id}/reactivate`,
+    STATUS: (id: string) => `/api/partners/${id}/status`,
+    ONBOARDING: '/api/partners/onboarding',
   },
   
   // Roaming
@@ -222,8 +235,8 @@ export const PAGINATION = {
 
 // Local Storage Keys
 export const STORAGE_KEYS = {
-  AUTH_TOKEN: 'auth_token',
-  AUTH_USER: 'auth_user',
+  AUTH_TOKEN: 'authToken',
+  AUTH_USER: 'authUser',
   THEME: 'theme',
   LANGUAGE: 'language',
 } as const;

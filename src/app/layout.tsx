@@ -2,7 +2,7 @@
 import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
-import AuthDebugInfo from '@/components/debug/AuthDebugInfo';
+import DevModeBanner from '@/components/debug/DevModeBanner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           {children}
-          <AuthDebugInfo />
+          <DevModeBanner />
         </AuthProvider>
       </body>
     </html>

@@ -113,7 +113,7 @@ export const ChargerMonitoringPage: React.FC<ChargerMonitoringPageProps> = ({
                 onClick={() => setSelectedGun(null)}
                 className="text-blue-600 hover:text-blue-500 text-sm"
               >
-                â† Change gun selection
+                ← Change gun selection
               </button>
             </div>
             <ChargerGunMonitor
@@ -156,7 +156,7 @@ export const ChargerMonitoringPage: React.FC<ChargerMonitoringPageProps> = ({
                 onClick={() => setSelectedGun(null)}
                 className="text-blue-600 hover:text-blue-500 text-sm"
               >
-                â† Change gun selection
+                ← Change gun selection
               </button>
             </div>
 

@@ -1,9 +1,10 @@
 ﻿'use client';
 
 import React, { useState } from 'react';
-import { Charger } from '@/types/charger';
+import { Charger, CreateChargerRequest } from '@/types/charger';
 import { AddChargerForm } from '@/components/chargers/AddChargerForm';
 import { ChargerList } from '@/components/chargers/ChargerList';
+import { chargerService } from '@/lib/charger-service';
 
 type View = 'list' | 'add' | 'edit';
 
@@ -41,12 +42,12 @@ export default function ChargersPage() {
             <nav className="flex items-center space-x-4 text-sm">
               <button
                 onClick={() => setCurrentView('list')}
-                className="text-blue-600 hover:text-blue-500"
+                className="text-emerald-500 hover:text-emerald-400"
               >
                 Chargers
               </button>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-600">Add New Charger</span>
+              <span className="text-slate-400">/</span>
+              <span className="text-slate-400">Add New Charger</span>
             </nav>
           </div>
         );
@@ -60,16 +61,16 @@ export default function ChargersPage() {
               >
                 Chargers
               </button>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-600">Edit Charger</span>
+              <span className="text-slate-400">/</span>
+              <span className="text-slate-400">Edit Charger</span>
             </nav>
             {selectedCharger && (
               <div className="mt-4">
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-white">
                   Edit {selectedCharger.name}
                 </h1>
-                <p className="text-sm text-gray-600">
-                  Charger ID: {selectedCharger.chargerId} â€¢ Station ID: {selectedCharger.stationId}
+                <p className="text-sm text-slate-300">
+                  Charger ID: {selectedCharger.chargerId} • Station ID: {selectedCharger.stationId}
                 </p>
               </div>
             )}
@@ -81,7 +82,7 @@ export default function ChargersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {renderHeader()}
 
@@ -101,29 +102,255 @@ export default function ChargersPage() {
         )}
 
         {currentView === 'edit' && selectedCharger && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-center py-12">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
-                <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
+          <EditChargerForm
+            charger={selectedCharger}
+            onSuccess={(charger) => {
+              console.log('Charger updated:', charger);
+              setCurrentView('list');
+              setRefreshTrigger(prev => prev + 1);
+            }}
+            onCancel={handleCancel}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Edit Charger Form Component
+function EditChargerForm({
+  charger,
+  onSuccess,
+  onCancel,
+}: {
+  charger: Charger;
+  onSuccess: (charger: Charger) => void;
+  onCancel: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<Partial<CreateChargerRequest>>({
+    chargerId: charger.chargerId,
+    stationId: charger.stationId,
+    name: charger.name,
+    description: charger.description || '',
+    type: charger.type,
+    manufacturer: charger.manufacturer,
+    model: charger.model,
+    serialNumber: charger.serialNumber,
+    maxPower: charger.maxPower,
+    location: {
+      address: charger.location.address,
+      city: charger.location.city,
+      state: charger.location.state,
+      zipCode: charger.location.zipCode,
+      country: charger.location.country,
+      latitude: charger.location.latitude,
+      longitude: charger.location.longitude,
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await chargerService.updateCharger(charger.id, formData);
+      if (result.success && result.charger) {
+        onSuccess(result.charger);
+      } else {
+        setError(result.errors?.[0]?.message || 'Failed to update charger');
+      }
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+      <h2 className="text-xl font-bold mb-6">Edit Charger</h2>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1">Charger ID</label>
+            <input
+              type="text"
+              value={formData.chargerId || ''}
+              onChange={(e) => setFormData({ ...formData, chargerId: e.target.value })}
+              className="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-900/50 text-slate-100"
+              disabled
+            />
+            <p className="text-xs text-slate-400 mt-1">Charger ID cannot be changed</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1">Station ID</label>
+            <input
+              type="text"
+              value={formData.stationId || ''}
+              onChange={(e) => setFormData({ ...formData, stationId: e.target.value })}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1">Name *</label>
+            <input
+              type="text"
+              required
+              value={formData.name || ''}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1">Type</label>
+            <select
+              value={formData.type || 'AC'}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value as 'AC' | 'DC' })}
+              className="w-full px-3 py-2 border rounded-lg"
+            >
+              <option value="AC">AC</option>
+              <option value="DC">DC</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
+          <textarea
+            value={formData.description || ''}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            className="w-full px-3 py-2 border rounded-lg"
+            rows={2}
+          />
+        </div>
+
+        {/* Hardware Info */}
+        <div className="border-t pt-4">
+          <h3 className="text-lg font-medium mb-4">Hardware Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Manufacturer</label>
+              <input
+                type="text"
+                value={formData.manufacturer || ''}
+                onChange={(e) => setFormData({ ...formData, manufacturer: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Model</label>
+              <input
+                type="text"
+                value={formData.model || ''}
+                onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Serial Number</label>
+              <input
+                type="text"
+                value={formData.serialNumber || ''}
+                onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+            </div>
+          </div>
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-slate-300 mb-1">Max Power (kW)</label>
+            <input
+              type="number"
+              value={formData.maxPower || 0}
+              onChange={(e) => setFormData({ ...formData, maxPower: parseFloat(e.target.value) })}
+              className="w-full px-3 py-2 border rounded-lg max-w-xs"
+            />
+          </div>
+        </div>
+
+        {/* Location Info */}
+        <div className="border-t pt-4">
+          <h3 className="text-lg font-medium mb-4">Location</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Address</label>
+              <input
+                type="text"
+                value={formData.location?.address || ''}
+                onChange={(e) => setFormData({ ...formData, location: { ...formData.location!, address: e.target.value } })}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">City</label>
+                <input
+                  type="text"
+                  value={formData.location?.city || ''}
+                  onChange={(e) => setFormData({ ...formData, location: { ...formData.location!, city: e.target.value } })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
               </div>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">Edit Functionality Coming Soon</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Charger editing capabilities will be implemented in the next phase.
-              </p>
-              <div className="mt-6">
-                <button
-                  onClick={handleCancel}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  Back to List
-                </button>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">State</label>
+                <input
+                  type="text"
+                  value={formData.location?.state || ''}
+                  onChange={(e) => setFormData({ ...formData, location: { ...formData.location!, state: e.target.value } })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">ZIP Code</label>
+                <input
+                  type="text"
+                  value={formData.location?.zipCode || ''}
+                  onChange={(e) => setFormData({ ...formData, location: { ...formData.location!, zipCode: e.target.value } })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Country</label>
+                <input
+                  type="text"
+                  value={formData.location?.country || ''}
+                  onChange={(e) => setFormData({ ...formData, location: { ...formData.location!, country: e.target.value } })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-3 pt-4 border-t">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 border border-slate-700 rounded-lg bg-slate-800/50 text-slate-100 hover:bg-slate-700/50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

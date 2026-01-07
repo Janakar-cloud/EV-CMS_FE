@@ -8,13 +8,13 @@ import OTPLoginForm from '@/components/auth/OTPLoginForm';
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
 import OTPVerifyForm from '@/components/auth/OTPVerifyForm';
 import ResetPasswordForm from '@/components/auth/ResetPasswordForm';
-import { BoltIcon } from '@heroicons/react/24/outline';
 
 interface AuthPageProps {
   onAuthSuccess?: (token: string, user: any) => void;
+  className?: string;
 }
 
-export default function AuthPage({ onAuthSuccess }: AuthPageProps) {
+export default function AuthPage({ onAuthSuccess, className }: AuthPageProps) {
   const [currentForm, setCurrentForm] = useState<AuthFormType>('login');
   const [formData, setFormData] = useState<any>({});
   const { login } = useAuth();
@@ -75,7 +75,7 @@ export default function AuthPage({ onAuthSuccess }: AuthPageProps) {
             otpType={formData.otpType}
             onSuccess={
               formData.otpType === 'login' 
-                ? handleAuthSuccess 
+                ? (token, user) => handleAuthSuccess(token || '', user)
                 : undefined
             }
             onSwitchForm={handleFormSwitch}
@@ -108,32 +108,6 @@ export default function AuthPage({ onAuthSuccess }: AuthPageProps) {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <div className="flex items-center">
-            <BoltIcon className="h-12 w-12 text-blue-600" />
-            <div className="ml-3">
-              <h1 className="text-3xl font-bold text-gray-900">EV CMS</h1>
-              <p className="text-sm text-gray-600">Management Portal</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Form Container */}
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        {renderCurrentForm()}
-      </div>
-
-      {/* Footer */}
-      <div className="mt-8 text-center">
-        <p className="text-xs text-gray-500">
-          Â© 2025 EV CMS. All rights reserved.
-        </p>
-      </div>
-    </div>
-  );
+  const classes = ['space-y-6', className].filter(Boolean).join(' ');
+  return <div className={classes}>{renderCurrentForm()}</div>;
 }

@@ -1,7 +1,7 @@
 ﻿// ⚠️ IMPORTANT: This service uses REST API (port 5000), NOT direct OCPP WebSocket (port 8080)
 // OCPP WebSocket is for charging stations only. Frontend uses REST API for all operations.
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
 export interface OCPPCommandRequest {
   chargerId: string;
@@ -35,7 +35,7 @@ export class OCPPService {
 
   private getAuthToken(): string | null {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('token');
+      return localStorage.getItem('authToken');
     }
     return null;
   }
@@ -70,13 +70,17 @@ export class OCPPService {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Backend returned error - will fallback to mock response
+        throw new Error(`Backend unavailable (status: ${response.status})`);
       }
 
       const data = await response.json();
       return data.data || data;
     } catch (error) {
-      console.error('OCPP command error:', error);
+      // Don't spam console - backend is likely not running
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('OCPP Service: Backend unavailable, using simulated response');
+      }
       
       // Fallback to mock response for development
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -204,9 +208,7 @@ export class OCPPService {
       // Fallback mock data
       await new Promise(resolve => setTimeout(resolve, 300));
       return [
-        { id: '1', chargerId: 'CHG-001', name: 'Main Entrance Fast Charger', status: 'available', location: 'San Francisco' },
-        { id: '2', chargerId: 'CHG-002', name: 'Parking Lot AC Charger', status: 'occupied', location: 'San Francisco' },
-        { id: '3', chargerId: 'CHG-003', name: 'Backup Fast Charger', status: 'maintenance', location: 'San Francisco' }
+        // Dummy chargers removed; only use real DB chargers
       ];
     }
   }

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import {
   Charger,
   ChargerStatus,
@@ -24,16 +24,7 @@ export const ChargerList: React.FC<ChargerListProps> = ({ onEditCharger, onAddCh
   const [typeFilter, setTypeFilter] = useState<ChargerType[]>([]);
   const [locationFilter, setLocationFilter] = useState('');
 
-  useEffect(() => {
-    loadChargers();
-    loadStats();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [chargers, searchQuery, statusFilter, typeFilter, locationFilter]);
-
-  const loadChargers = async () => {
+  const loadChargers = useCallback(async () => {
     try {
       setLoading(true);
       const response = await chargerService.getAllChargers();
@@ -47,55 +38,44 @@ export const ChargerList: React.FC<ChargerListProps> = ({ onEditCharger, onAddCh
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     try {
-      const statsData = await chargerService.getChargerStats();
-      setStats(statsData);
+      const response = await chargerService.getStats();
+      if (response.success) {
+        setStats(response.stats);
+      }
     } catch (err) {
-      console.error('Failed to load stats:', err);
+      console.error('Failed to load stats');
     }
-  };
+  }, []);
 
-  const applyFilters = () => {
-    const filters: ChargerFilters = {
-      searchQuery: searchQuery || undefined,
-      status: statusFilter.length > 0 ? statusFilter : undefined,
-      type: typeFilter.length > 0 ? typeFilter : undefined,
-      location: locationFilter || undefined
-    };
-
-    let filtered = [...chargers];
-
-    if (filters.searchQuery) {
-      const query = filters.searchQuery.toLowerCase();
-      filtered = filtered.filter(charger =>
-        charger.chargerId.toLowerCase().includes(query) ||
-        charger.stationId.toLowerCase().includes(query) ||
-        charger.name.toLowerCase().includes(query) ||
-        charger.manufacturer.toLowerCase().includes(query) ||
-        charger.model.toLowerCase().includes(query)
-      );
+  const applyFilters = useCallback(() => {
+    let filtered = chargers;
+    if (searchQuery) {
+      filtered = filtered.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
     }
-
-    if (filters.status && filters.status.length > 0) {
-      filtered = filtered.filter(charger => filters.status!.includes(charger.status));
+    if (statusFilter.length > 0) {
+      filtered = filtered.filter(c => statusFilter.includes(c.status));
     }
-
-    if (filters.type && filters.type.length > 0) {
-      filtered = filtered.filter(charger => filters.type!.includes(charger.type));
+    if (typeFilter.length > 0) {
+      filtered = filtered.filter(c => typeFilter.includes(c.type));
     }
-
-    if (filters.location) {
-      filtered = filtered.filter(charger =>
-        charger.location.city.toLowerCase().includes(filters.location!.toLowerCase()) ||
-        charger.location.address.toLowerCase().includes(filters.location!.toLowerCase())
-      );
+    if (locationFilter) {
+      filtered = filtered.filter(c => c.location?.toLowerCase().includes(locationFilter.toLowerCase()));
     }
-
     setFilteredChargers(filtered);
-  };
+  }, [chargers, searchQuery, statusFilter, typeFilter, locationFilter]);
+
+  useEffect(() => {
+    loadChargers();
+    loadStats();
+  }, [loadChargers, loadStats]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
 
   const handleStatusChange = async (chargerId: string, newStatus: ChargerStatus) => {
     try {

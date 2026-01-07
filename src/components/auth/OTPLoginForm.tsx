@@ -190,7 +190,7 @@ export default function OTPLoginForm({ onSuccess, onBack, onSwitchForm }: OTPLog
             <div className="text-xs text-blue-700">
               <p className="font-medium mb-1">How it works:</p>
               <p>
-                We'll send a 6-digit code to your email or phone. 
+                We&apos;ll send a 6-digit code to your email or phone. 
                 Use this code to sign in without entering your password.
               </p>
             </div>

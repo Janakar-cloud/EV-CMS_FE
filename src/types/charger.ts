@@ -1,6 +1,7 @@
 ﻿export type ChargerStatus = 'available' | 'occupied' | 'maintenance' | 'offline' | 'faulted';
 export type ChargerType = 'AC' | 'DC' | 'DC_FAST';
 export type ConnectorType = 'Type1' | 'Type2' | 'CCS1' | 'CCS2' | 'CHAdeMO' | 'Tesla';
+export type ChargerManufacturer = 'ABB' | 'ChargePoint' | 'Tritium' | 'Tesla' | 'Other';
 
 export interface Connector {
   id: string;

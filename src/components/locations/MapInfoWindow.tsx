@@ -50,7 +50,7 @@ const MapInfoWindow: React.FC<MapInfoWindowProps> = ({ map, charger, onClose }) 
 
     const getConnectorIcon = (type: string) => {
       switch (type) {
-        case 'CCS2': return 'âš¡';
+        case 'CCS2': return '⚡';
         case 'CHAdeMO': return 'ðŸ”Œ';
         case 'Type2': return 'ðŸ”Œ';
         default: return 'ðŸ”Œ';
@@ -85,7 +85,7 @@ const MapInfoWindow: React.FC<MapInfoWindowProps> = ({ map, charger, onClose }) 
           </div>
           <div>
             <p class="text-xs text-gray-500">Temperature</p>
-            <p class="font-semibold">${charger.temperature || 'N/A'}Â°C</p>
+            <p class="font-semibold">${charger.temperature || 'N/A'}°C</p>
           </div>
         </div>
 
@@ -111,7 +111,7 @@ const MapInfoWindow: React.FC<MapInfoWindowProps> = ({ map, charger, onClose }) 
 
         ${charger.maintenance.alerts.length > 0 ? `
           <div class="border-t pt-3 mt-3">
-            <h4 class="font-medium text-red-600 mb-2">âš ï¸ Active Alerts</h4>
+            <h4 class="font-medium text-red-600 mb-2">⚠️ Active Alerts</h4>
             <div class="space-y-1">
               ${charger.maintenance.alerts.map(alert => `
                 <p class="text-xs text-red-600">${alert.message}</p>
