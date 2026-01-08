@@ -1,8 +1,5 @@
 'use client';
 
-// Force dynamic rendering to avoid prerendering issues
-export const dynamic = 'force-dynamic';
-
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { dashboardService } from '@/lib/dashboard-service';
