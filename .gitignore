@@ -1,57 +1,144 @@
-# Dependencies
+# ============================================
+# DEPENDENCIES
+# ============================================
 node_modules/
 .pnp
 .pnp.js
 
-# Testing
+# ============================================
+# TESTING
+# ============================================
 coverage/
+.nyc_output/
+.jest_cache/
+.vitest_cache/
 
-# Next.js
+# ============================================
+# NEXT.JS BUILD OUTPUT
+# ============================================
 .next/
 out/
 build/
 dist/
 
-# Production
+# ============================================
+# PRODUCTION & BUILD
+# ============================================
 *.tsbuildinfo
 next-env.d.ts
 
-# Debug
+# ============================================
+# DEBUG LOGS
+# ============================================
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+pnpm-debug.log*
 
-# Build Logs & Artifacts
+# ============================================
+# BUILD LOGS & ARTIFACTS (DO NOT DEPLOY)
+# ============================================
 *.log
 build*.log
 build*.txt
 build*.json
 final*.log
+build_final.txt
+build_log.txt
+build_log2.txt
+build-output.txt
+frontendevcms.txt
 tsconfig.tsbuildinfo
 
-# Test Setup Scripts
+# ============================================
+# TEST SETUP SCRIPTS (DO NOT DEPLOY)
+# ============================================
 RUN_FULL_TEST_SETUP.ps1
 
-# Environment
+# ============================================
+# ENVIRONMENT FILES (Local only)
+# ============================================
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.staging.local
 
-# IDE
+# ============================================
+# DOCUMENTATION FILES (EXCLUDED FROM VERCEL)
+# ============================================
+# All markdown files except README.md
+*.md
+!README.md
+!CHANGELOG.md
+
+# Specific documentation to exclude from deployment
+VERCEL_HOSTING_GUIDE.md
+BACKEND_TEAM_QUESTIONS.md
+DEPLOYMENT_ANSWERS_SUMMARY.md
+VERCEL_ENV_QUICK_SETUP.md
+VERCEL_ENV_VARIABLES_TO_ADD.md
+FRONTEND_DEPLOYMENT_CHECKLIST.md
+IMPORT_TO_VERCEL.md
+
+# ============================================
+# IDE / EDITOR FILES
+# ============================================
 .vscode/
 .idea/
 *.swp
 *.swo
+*.swn
+*.sublime-project
+*.sublime-workspace
+*.iml
+.editorconfig
 
-# OS
+# ============================================
+# OPERATING SYSTEM FILES
+# ============================================
 .DS_Store
 Thumbs.db
+*.pem
 
-# Turbopack
+# ============================================
+# TEMPORARY FILES
+# ============================================
+tmp/
+temp/
+*.tmp
+
+# ============================================
+# TURBOPACK CACHE
+# ============================================
 .turbo/
 
-# Vercel
+# ============================================
+# VERCEL DEPLOYMENT
+# ============================================
 .vercel
+.vercelignore
+
+# ============================================
+# DESIGN FILES & INTEGRATION
+# ============================================
+design/
+frontend-integration/
+*.figma
+*.sketch
+*.xd
+
+# ============================================
+# BACKEND INTEGRATION FILES
+# ============================================
+chargers-api.js
+socket-handler.js
+tools/
+
+# ============================================
+# GIT FILES
+# ============================================
+.git/
+.gitattributes
