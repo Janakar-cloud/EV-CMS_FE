@@ -1,22 +1,10 @@
 // Booking Service - Complete CRUD with real API integration
 import apiClient from './api-client';
+import type { Booking } from '@/types/booking';
 
 const unwrap = <T>(payload: any): T => (payload?.data?.data ?? payload?.data ?? payload) as T;
 
-export interface Booking {
-  id: string;
-  userId: string;
-  stationId: string;
-  chargerId: string;
-  bookedFrom: string;
-  bookedUntil: string;
-  status: 'active' | 'in_progress' | 'completed' | 'cancelled';
-  cost: number;
-  vehicleId?: string;
-  bookingReference: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export type { Booking };
 
 export interface BookingFilters {
   userId?: string;
@@ -27,9 +15,11 @@ export interface BookingFilters {
 
 export interface BookingRequest {
   stationId: string;
-  chargerId: string;
-  bookedFrom: string;
-  bookedUntil: string;
+  chargerId?: string;
+  connectorType?: string;
+  bookedFrom?: string;
+  bookedUntil?: string;
+  scheduledTime?: string;
   vehicleId?: string;
 }
 
@@ -111,12 +101,17 @@ class BookingService {
   /**
    * Rate booking
    */
-  async rateBooking(id: string, rating: number, comment: string, reviewType: 'station' | 'charger') {
+  async rateBooking(
+    id: string,
+    rating: number,
+    comment: string,
+    reviewType: 'station' | 'charger'
+  ) {
     try {
       const response = await apiClient.post(`${BookingService.API_BASE}/${id}/rate`, {
         rating,
         comment,
-        reviewType
+        reviewType,
       });
       return unwrap(response);
     } catch (error) {

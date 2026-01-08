@@ -42,7 +42,7 @@ export default function EditVehiclePage() {
         year: vehicle.year.toString(),
         batteryCapacity: vehicle.batteryCapacity.toString(),
         registrationNumber: vehicle.registrationNumber,
-        isDefault: vehicle.isDefault,
+        isDefault: vehicle.isDefault ?? false,
       });
     } catch (error: any) {
       toast.error(error.message || 'Failed to load vehicle');
@@ -101,7 +101,7 @@ export default function EditVehiclePage() {
                 <Input
                   id="make"
                   value={formData.make}
-                  onChange={(e) => setFormData({ ...formData, make: e.target.value })}
+                  onChange={e => setFormData({ ...formData, make: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
@@ -109,7 +109,7 @@ export default function EditVehiclePage() {
                 <Input
                   id="model"
                   value={formData.model}
-                  onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                  onChange={e => setFormData({ ...formData, model: e.target.value })}
                 />
               </div>
             </div>
@@ -121,7 +121,7 @@ export default function EditVehiclePage() {
                   id="year"
                   type="number"
                   value={formData.year}
-                  onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                  onChange={e => setFormData({ ...formData, year: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
@@ -131,7 +131,7 @@ export default function EditVehiclePage() {
                   type="number"
                   step="0.1"
                   value={formData.batteryCapacity}
-                  onChange={(e) => setFormData({ ...formData, batteryCapacity: e.target.value })}
+                  onChange={e => setFormData({ ...formData, batteryCapacity: e.target.value })}
                 />
               </div>
             </div>
@@ -141,12 +141,17 @@ export default function EditVehiclePage() {
               <Input
                 id="registration"
                 value={formData.registrationNumber}
-                onChange={(e) => setFormData({ ...formData, registrationNumber: e.target.value })}
+                onChange={e => setFormData({ ...formData, registrationNumber: e.target.value })}
               />
             </div>
 
             <div className="flex gap-4">
-              <Button type="button" variant="outline" className="flex-1" onClick={() => router.back()}>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => router.back()}
+              >
                 Cancel
               </Button>
               <Button type="submit" className="flex-1" disabled={submitting}>

@@ -3,7 +3,13 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { sessionService } from '@/lib/session-service';
 import type { ChargingSession } from '@/types/session';
 import { toast } from 'sonner';
@@ -41,17 +47,21 @@ export default function SessionsPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: any; label: string }> = {
+    const variants = {
       active: { variant: 'default', label: 'Active' },
       completed: { variant: 'outline', label: 'Completed' },
       stopped: { variant: 'secondary', label: 'Stopped' },
       failed: { variant: 'destructive', label: 'Failed' },
-    };
-    const config = variants[status] || variants.active;
+    } as const;
+
+    const key = (
+      status in variants ? (status as keyof typeof variants) : 'active'
+    ) as keyof typeof variants;
+    const config = variants[key];
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  const formatDuration = (start: string, end?: string) => {
+  const formatDuration = (start: string, end?: string | null) => {
     const startTime = new Date(start);
     const endTime = end ? new Date(end) : new Date();
     const durationMs = endTime.getTime() - startTime.getTime();
@@ -72,7 +82,7 @@ export default function SessionsPage() {
         <CardContent className="pt-6">
           <Select
             value={status}
-            onValueChange={(value) => {
+            onValueChange={value => {
               setStatus(value);
               setPage(1);
             }}
@@ -111,7 +121,7 @@ export default function SessionsPage() {
       ) : (
         <>
           <div className="space-y-4">
-            {sessions.map((session) => (
+            {sessions.map(session => (
               <Card
                 key={session.id}
                 className="cursor-pointer transition-shadow hover:shadow-md"
@@ -155,7 +165,7 @@ export default function SessionsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           router.push(`/sessions/${session.id}`);
                         }}
@@ -174,7 +184,7 @@ export default function SessionsPage() {
             <div className="mt-6 flex items-center justify-center gap-2">
               <Button
                 variant="outline"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
               >
                 Previous
@@ -184,7 +194,7 @@ export default function SessionsPage() {
               </span>
               <Button
                 variant="outline"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
               >
                 Next

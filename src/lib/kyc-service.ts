@@ -1,6 +1,13 @@
 import { apiClient } from './api-client';
 import type { KYCDocument, KYCStatus, SubmitKYCRequest, VerifyKYCRequest } from '@/types/kyc';
-import type { PaginatedResponse } from '@/types';
+
+// Local type for paginated responses
+interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
 
 /**
  * KYC Service

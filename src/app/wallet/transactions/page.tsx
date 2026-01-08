@@ -3,7 +3,13 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { walletService } from '@/lib/wallet-service';
 import type { Transaction } from '@/types/wallet';
 import { toast } from 'sonner';
@@ -54,8 +60,8 @@ export default function TransactionsPage() {
       pending: { variant: 'secondary', label: 'Pending' },
       failed: { variant: 'destructive', label: 'Failed' },
     };
-    const config = variants[status] || variants.completed;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    const config = variants[status] ?? variants['completed'];
+    return <Badge variant={config?.variant ?? 'default'}>{config?.label ?? status}</Badge>;
   };
 
   return (
@@ -73,7 +79,7 @@ export default function TransactionsPage() {
         <CardContent className="pt-6">
           <Select
             value={type}
-            onValueChange={(value) => {
+            onValueChange={value => {
               setType(value);
               setPage(1);
             }}
@@ -112,7 +118,7 @@ export default function TransactionsPage() {
           <Card>
             <CardContent className="p-0">
               <div className="divide-y">
-                {transactions.map((transaction) => (
+                {transactions.map(transaction => (
                   <div key={transaction.id} className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-4">
                       {getTransactionIcon(transaction.type)}
@@ -134,8 +140,7 @@ export default function TransactionsPage() {
                           transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'
                         }`}
                       >
-                        {transaction.type === 'credit' ? '+' : '-'}₹
-                        {transaction.amount.toFixed(2)}
+                        {transaction.type === 'credit' ? '+' : '-'}₹{transaction.amount.toFixed(2)}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         Balance: ₹{transaction.balanceAfter.toFixed(2)}
@@ -153,7 +158,7 @@ export default function TransactionsPage() {
             <div className="mt-6 flex items-center justify-center gap-2">
               <Button
                 variant="outline"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
               >
                 Previous
@@ -163,7 +168,7 @@ export default function TransactionsPage() {
               </span>
               <Button
                 variant="outline"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
               >
                 Next

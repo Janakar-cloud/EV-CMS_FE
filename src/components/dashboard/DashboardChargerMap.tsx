@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
 import { chargerService } from '@/lib/charger-service';
 import { Charger } from '@/types/charger';
@@ -28,7 +28,7 @@ const DEMO_CHARGERS: Charger[] = [
       zipCode: '110001',
       country: 'India',
       latitude: 28.6139,
-      longitude: 77.2090,
+      longitude: 77.209,
     },
     installationDate: new Date('2024-01-01'),
     totalEnergyDelivered: 1000,
@@ -51,14 +51,14 @@ const DEMO_CHARGERS: Charger[] = [
     firmwareVersion: '2.0.0',
     maxPower: 50,
     connectors: [],
-    status: 'charging',
+    status: 'occupied',
     location: {
       address: '456 Highway Rd, Mumbai',
       city: 'Mumbai',
       state: 'Maharashtra',
       zipCode: '400001',
       country: 'India',
-      latitude: 19.0760,
+      latitude: 19.076,
       longitude: 72.8777,
     },
     installationDate: new Date('2024-02-01'),
@@ -109,11 +109,34 @@ export function DashboardChargerMap() {
   const [mapCenter, setMapCenter] = useState({ lat: 20.5937, lng: 78.9629 }); // India center
   const [mapZoom, setMapZoom] = useState(5);
   const [apiKeyReady, setApiKeyReady] = useState(false);
+  const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
+
+  const onMapLoad = useCallback((map: google.maps.Map) => {
+    setMapRef(map);
+  }, []);
+
+  const onCenterChanged = useCallback(() => {
+    if (mapRef) {
+      const center = mapRef.getCenter();
+      if (center) {
+        setMapCenter({ lat: center.lat(), lng: center.lng() });
+      }
+    }
+  }, [mapRef]);
+
+  const onZoomChanged = useCallback(() => {
+    if (mapRef) {
+      const zoom = mapRef.getZoom();
+      if (zoom !== undefined) {
+        setMapZoom(zoom);
+      }
+    }
+  }, [mapRef]);
 
   useEffect(() => {
     // Load chargers from API
     loadChargers();
-    
+
     // Check if API key is available
     if (process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
       setApiKeyReady(true);
@@ -144,10 +167,14 @@ export function DashboardChargerMap() {
     switch (charger.status) {
       case 'available':
         return '#10B981'; // Green
-      case 'charging':
+      case 'occupied':
         return '#F59E0B'; // Amber
       case 'offline':
         return '#EF4444'; // Red
+      case 'maintenance':
+        return '#3B82F6'; // Blue
+      case 'faulted':
+        return '#DC2626'; // Red
       default:
         return '#6B7280'; // Gray
     }
@@ -157,10 +184,14 @@ export function DashboardChargerMap() {
     switch (status) {
       case 'available':
         return '✓';
-      case 'charging':
+      case 'occupied':
         return '⚡';
       case 'offline':
         return '✕';
+      case 'maintenance':
+        return '🔧';
+      case 'faulted':
+        return '⚠';
       default:
         return '?';
     }
@@ -168,15 +199,17 @@ export function DashboardChargerMap() {
 
   const mapContainerStyle = {
     width: '100%',
-    height: '500px'
+    height: '500px',
   };
 
   if (loading) {
     return (
       <div className="rounded-3xl border border-white/5 bg-gradient-to-br from-slate-900/80 to-slate-900/40 p-6 shadow-2xl">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">Live Charger Map</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
+              Live Charger Map
+            </p>
             <p className="text-xs text-slate-500">All charger locations in real-time</p>
           </div>
           <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/80 px-3 py-1 text-xs font-semibold text-emerald-300">
@@ -184,7 +217,7 @@ export function DashboardChargerMap() {
             Live
           </span>
         </div>
-        <div className="h-96 rounded-2xl bg-slate-800 animate-pulse flex items-center justify-center">
+        <div className="flex h-96 animate-pulse items-center justify-center rounded-2xl bg-slate-800">
           <span className="text-slate-400">Loading map...</span>
         </div>
       </div>
@@ -193,9 +226,11 @@ export function DashboardChargerMap() {
 
   return (
     <div className="rounded-3xl border border-white/5 bg-gradient-to-br from-slate-900/80 to-slate-900/40 p-6 shadow-2xl">
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">Live Charger Map</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
+            Live Charger Map
+          </p>
           <p className="text-xs text-slate-500">All charger locations in real-time</p>
         </div>
         <div className="flex items-center gap-2">
@@ -210,7 +245,7 @@ export function DashboardChargerMap() {
       </div>
 
       {chargers.length === 0 ? (
-        <div className="h-96 rounded-2xl border border-white/10 bg-white/5 flex items-center justify-center text-slate-400">
+        <div className="flex h-96 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-400">
           No chargers available
         </div>
       ) : (
@@ -219,10 +254,9 @@ export function DashboardChargerMap() {
             mapContainerStyle={mapContainerStyle}
             center={mapCenter}
             zoom={mapZoom}
-            onCenterChanged={(newCenter) => {
-              if (newCenter) setMapCenter({ lat: newCenter.lat(), lng: newCenter.lng() });
-            }}
-            onZoomChanged={(newZoom) => setMapZoom(newZoom || 5)}
+            onLoad={onMapLoad}
+            onCenterChanged={onCenterChanged}
+            onZoomChanged={onZoomChanged}
             options={{
               mapTypeControl: true,
               streetViewControl: false,
@@ -231,27 +265,27 @@ export function DashboardChargerMap() {
                 {
                   featureType: 'all',
                   elementType: 'all',
-                  stylers: [{ saturation: -100 }]
+                  stylers: [{ saturation: -100 }],
                 },
                 {
                   featureType: 'water',
                   elementType: 'all',
-                  stylers: [{ color: '#1a1a2e' }]
+                  stylers: [{ color: '#1a1a2e' }],
                 },
                 {
                   featureType: 'landscape',
                   elementType: 'all',
-                  stylers: [{ color: '#0f1419' }]
-                }
-              ]
+                  stylers: [{ color: '#0f1419' }],
+                },
+              ],
             }}
           >
-            {chargers.map((charger) => (
+            {chargers.map(charger => (
               <Marker
                 key={charger.id}
                 position={{
-                  lat: charger.latitude || 0,
-                  lng: charger.longitude || 0
+                  lat: charger.location?.latitude || 0,
+                  lng: charger.location?.longitude || 0,
                 }}
                 title={charger.name}
                 icon={{
@@ -270,17 +304,24 @@ export function DashboardChargerMap() {
             {selectedCharger && (
               <InfoWindow
                 position={{
-                  lat: selectedCharger.latitude || 0,
-                  lng: selectedCharger.longitude || 0
+                  lat: selectedCharger.location?.latitude || 0,
+                  lng: selectedCharger.location?.longitude || 0,
                 }}
                 onCloseClick={() => setSelectedCharger(null)}
               >
-                <div className="bg-white p-3 rounded max-w-xs">
-                  <h3 className="font-bold text-slate-900 text-sm mb-2">{selectedCharger.name}</h3>
-                  <div className="text-xs text-slate-600 space-y-1">
-                    <p><strong>Power:</strong> {selectedCharger.power} kW</p>
-                    <p><strong>Type:</strong> {selectedCharger.connectorType}</p>
-                    <p><strong>Status:</strong> <span className="capitalize font-semibold">{selectedCharger.status}</span></p>
+                <div className="max-w-xs rounded bg-white p-3">
+                  <h3 className="mb-2 text-sm font-bold text-slate-900">{selectedCharger.name}</h3>
+                  <div className="space-y-1 text-xs text-slate-600">
+                    <p>
+                      <strong>Power:</strong> {selectedCharger.maxPower} kW
+                    </p>
+                    <p>
+                      <strong>Type:</strong> {selectedCharger.type}
+                    </p>
+                    <p>
+                      <strong>Status:</strong>{' '}
+                      <span className="font-semibold capitalize">{selectedCharger.status}</span>
+                    </p>
                   </div>
                 </div>
               </InfoWindow>
@@ -290,18 +331,22 @@ export function DashboardChargerMap() {
       )}
 
       {/* Legend */}
-      <div className="mt-4 flex gap-6 text-xs text-slate-300 flex-wrap">
+      <div className="mt-4 flex flex-wrap gap-6 text-xs text-slate-300">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10B981' }} />
+          <div className="h-3 w-3 rounded-full" style={{ backgroundColor: '#10B981' }} />
           <span>Available</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F59E0B' }} />
-          <span>Charging</span>
+          <div className="h-3 w-3 rounded-full" style={{ backgroundColor: '#F59E0B' }} />
+          <span>Occupied</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#EF4444' }} />
+          <div className="h-3 w-3 rounded-full" style={{ backgroundColor: '#EF4444' }} />
           <span>Offline</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-full" style={{ backgroundColor: '#3B82F6' }} />
+          <span>Maintenance</span>
         </div>
       </div>
     </div>

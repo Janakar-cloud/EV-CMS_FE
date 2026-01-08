@@ -39,7 +39,7 @@ export default function InvoiceDetailPage() {
   const handleDownload = async () => {
     if (!invoice) return;
     try {
-      const blob = await billingService.downloadInvoice(invoice.id);
+      const blob = await billingService.exportBillingData('pdf', { invoiceId: invoice.id });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -113,7 +113,11 @@ export default function InvoiceDetailPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Issued Date</span>
-              <span className="font-medium">{format(new Date(invoice.issuedAt), 'PPP')}</span>
+              <span className="font-medium">
+                {invoice.issuedAt
+                  ? format(new Date(invoice.issuedAt), 'PPP')
+                  : format(new Date(invoice.createdAt), 'PPP')}
+              </span>
             </div>
             {invoice.dueDate && (
               <div className="flex items-center justify-between">
@@ -136,18 +140,27 @@ export default function InvoiceDetailPage() {
             <CardTitle>Customer Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div>
-              <p className="text-sm text-muted-foreground">Name</p>
-              <p className="font-medium">{invoice.customer.name}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Email</p>
-              <p className="font-medium">{invoice.customer.email}</p>
-            </div>
-            {invoice.customer.phone && (
+            {invoice.customer ? (
+              <>
+                <div>
+                  <p className="text-sm text-muted-foreground">Name</p>
+                  <p className="font-medium">{invoice.customer.name}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="font-medium">{invoice.customer.email}</p>
+                </div>
+                {invoice.customer.phone && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Phone</p>
+                    <p className="font-medium">{invoice.customer.phone}</p>
+                  </div>
+                )}
+              </>
+            ) : (
               <div>
-                <p className="text-sm text-muted-foreground">Phone</p>
-                <p className="font-medium">{invoice.customer.phone}</p>
+                <p className="text-sm text-muted-foreground">Name</p>
+                <p className="font-medium">{invoice.userName}</p>
               </div>
             )}
           </CardContent>
@@ -164,7 +177,7 @@ export default function InvoiceDetailPage() {
                 <div key={idx} className="flex items-start justify-between">
                   <div className="flex-1">
                     <p className="font-medium">{item.description}</p>
-                    {item.quantity && (
+                    {item.quantity && item.unitPrice && (
                       <p className="text-sm text-muted-foreground">
                         Quantity: {item.quantity} × ₹{item.unitPrice.toFixed(2)}
                       </p>
@@ -193,7 +206,7 @@ export default function InvoiceDetailPage() {
                 <span>₹{invoice.tax.toFixed(2)}</span>
               </div>
             )}
-            {invoice.discount > 0 && (
+            {invoice.discount && invoice.discount > 0 && (
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Discount</span>
                 <span className="text-green-600">-₹{invoice.discount.toFixed(2)}</span>
@@ -202,7 +215,7 @@ export default function InvoiceDetailPage() {
             <Separator className="my-2" />
             <div className="flex items-center justify-between text-lg font-bold">
               <span>Total Amount</span>
-              <span>₹{invoice.totalAmount.toFixed(2)}</span>
+              <span>₹{(invoice.totalAmount ?? invoice.total).toFixed(2)}</span>
             </div>
           </CardContent>
         </Card>

@@ -6,7 +6,16 @@ import { Button } from '@/components/ui/button';
 import { sessionService } from '@/lib/session-service';
 import type { ChargingSession } from '@/types/session';
 import { toast } from 'sonner';
-import { ArrowLeft, Battery, Calendar, Clock, Zap, Loader2, MapPin, StopCircle } from 'lucide-react';
+import {
+  ArrowLeft,
+  Battery,
+  Calendar,
+  Clock,
+  Zap,
+  Loader2,
+  MapPin,
+  StopCircle,
+} from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -58,7 +67,7 @@ export default function SessionDetailPage() {
     }
   };
 
-  const formatDuration = (start: string, end?: string) => {
+  const formatDuration = (start: string, end?: string | null) => {
     const startTime = new Date(start);
     const endTime = end ? new Date(end) : new Date();
     const durationMs = endTime.getTime() - startTime.getTime();
@@ -228,7 +237,9 @@ export default function SessionDetailPage() {
           <CardContent className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Energy Cost</span>
-              <span>₹{(session.energyConsumed * (session.connector.pricing?.basePrice || 0)).toFixed(2)}</span>
+              <span>
+                ₹{(session.energyConsumed * (session.connector.pricing?.basePrice || 0)).toFixed(2)}
+              </span>
             </div>
             <Separator className="my-2" />
             <div className="flex items-center justify-between text-lg font-bold">
@@ -241,12 +252,7 @@ export default function SessionDetailPage() {
         {/* Actions */}
         {session.status === 'active' && (
           <div className="flex justify-center">
-            <Button
-              variant="destructive"
-              size="lg"
-              onClick={handleStopSession}
-              disabled={stopping}
-            >
+            <Button variant="destructive" size="lg" onClick={handleStopSession} disabled={stopping}>
               {stopping ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -264,10 +270,7 @@ export default function SessionDetailPage() {
 
         {session.status === 'completed' && (
           <div className="flex justify-center">
-            <Button
-              variant="outline"
-              onClick={() => router.push(`/sessions/${sessionId}/cdr`)}
-            >
+            <Button variant="outline" onClick={() => router.push(`/sessions/${sessionId}/cdr`)}>
               View Charge Detail Record
             </Button>
           </div>

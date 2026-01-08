@@ -44,6 +44,8 @@ export default function RoamingAgreementsPage() {
     return colors[status] || 'bg-slate-800/50 border border-slate-700 text-slate-400';
   };
 
+  const getStatusBadge = getStatusColor;
+
   const getTypeColor = (type: string) => {
     const colors: Record<string, string> = {
       roaming: 'bg-blue-950/50 border border-blue-800 text-blue-400',
@@ -52,6 +54,8 @@ export default function RoamingAgreementsPage() {
     };
     return colors[type] || 'bg-slate-800/50 border border-slate-700 text-slate-400';
   };
+
+  const getTypeBadge = getTypeColor;
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-IN', {
@@ -66,21 +70,26 @@ export default function RoamingAgreementsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-100">Roaming Agreements</h1>
-          <button className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium transition-colors">
+          <button className="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition-colors hover:bg-emerald-500">
             + New Agreement
           </button>
         </div>
 
         {error && (
-          <div className="p-4 bg-red-950/50 border border-red-800 text-red-400 rounded-lg">{error}</div>
+          <div className="rounded-lg border border-red-800 bg-red-950/50 p-4 text-red-400">
+            {error}
+          </div>
         )}
 
         {/* Filters */}
         <div className="flex gap-4">
           <select
             value={statusFilter}
-            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-            className="px-4 py-2 border border-slate-700 rounded-lg bg-slate-900/50 text-slate-100"
+            onChange={e => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
+            className="rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-slate-100"
           >
             <option value="">All Status</option>
             <option value="active">Active</option>
@@ -91,49 +100,73 @@ export default function RoamingAgreementsPage() {
         </div>
 
         {/* Agreements Table */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
+        <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-800/50">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-700">
               <thead className="bg-slate-900/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Partner</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Revenue Split</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Start Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">End Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Partner
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Type
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Revenue Split
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Start Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    End Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-slate-400">Loading agreements...</td>
+                    <td colSpan={7} className="px-6 py-8 text-center text-slate-400">
+                      Loading agreements...
+                    </td>
                   </tr>
                 ) : agreements.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-slate-400">No agreements found</td>
+                    <td colSpan={7} className="px-6 py-8 text-center text-slate-400">
+                      No agreements found
+                    </td>
                   </tr>
                 ) : (
-                  agreements.map((agreement) => (
+                  agreements.map(agreement => (
                     <tr key={agreement._id}>
                       <td className="px-6 py-4">
                         <div className="font-medium text-slate-100">{agreement.partnerName}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded text-xs font-medium uppercase ${getTypeBadge(agreement.type)}`}>
+                        <span
+                          className={`rounded px-2 py-1 text-xs font-medium uppercase ${getTypeBadge(agreement.type)}`}
+                        >
                           {agreement.type}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(agreement.status)}`}>
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${getStatusBadge(agreement.status)}`}
+                        >
                           {agreement.status.toUpperCase()}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-200">
                         {agreement.terms.revenueSplit}%
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-400">{formatDate(agreement.startDate)}</td>
+                      <td className="px-6 py-4 text-sm text-slate-400">
+                        {formatDate(agreement.startDate)}
+                      </td>
                       <td className="px-6 py-4 text-sm text-slate-400">
                         {agreement.endDate ? formatDate(agreement.endDate) : 'No end date'}
                       </td>
@@ -148,20 +181,22 @@ export default function RoamingAgreementsPage() {
           </div>
 
           {totalPages > 1 && (
-            <div className="px-6 py-4 border-t flex items-center justify-between">
-              <div className="text-sm text-slate-400">Page {page} of {totalPages}</div>
+            <div className="flex items-center justify-between border-t px-6 py-4">
+              <div className="text-sm text-slate-400">
+                Page {page} of {totalPages}
+              </div>
               <div className="flex gap-2">
                 <button
                   disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}
-                  className="px-3 py-1 border rounded disabled:opacity-50"
+                  className="rounded border px-3 py-1 disabled:opacity-50"
                 >
                   Previous
                 </button>
                 <button
                   disabled={page === totalPages}
                   onClick={() => setPage(p => p + 1)}
-                  className="px-3 py-1 border rounded disabled:opacity-50"
+                  className="rounded border px-3 py-1 disabled:opacity-50"
                 >
                   Next
                 </button>

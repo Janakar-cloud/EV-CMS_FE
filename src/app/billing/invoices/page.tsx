@@ -30,9 +30,9 @@ export default function InvoicesPage() {
       const params: any = { page, limit: 10 };
       if (search) params.invoiceNumber = search;
 
-      const response = await billingService.getInvoices(params);
-      setInvoices(response.data);
-      setTotalPages(response.pagination.totalPages);
+      const invoices = await billingService.getInvoices(params);
+      setInvoices(invoices);
+      setTotalPages(Math.ceil(invoices.length / 10));
     } catch (error: any) {
       toast.error(error.message || 'Failed to load invoices');
     } finally {
@@ -47,13 +47,13 @@ export default function InvoicesPage() {
       overdue: { variant: 'destructive', label: 'Overdue' },
       cancelled: { variant: 'outline', label: 'Cancelled' },
     };
-    const config = variants[status] || variants.pending;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    const config = variants[status] ?? variants['pending'];
+    return <Badge variant={config!.variant}>{config!.label}</Badge>;
   };
 
   const handleDownload = async (invoiceId: string) => {
     try {
-      const blob = await billingService.downloadInvoice(invoiceId);
+      const blob = await billingService.exportBillingData('pdf', { invoiceId });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -83,7 +83,7 @@ export default function InvoicesPage() {
             <Input
               placeholder="Search by invoice number..."
               value={search}
-              onChange={(e) => {
+              onChange={e => {
                 setSearch(e.target.value);
                 setPage(1);
               }}
@@ -111,7 +111,7 @@ export default function InvoicesPage() {
       ) : (
         <>
           <div className="space-y-4">
-            {invoices.map((invoice) => (
+            {invoices.map(invoice => (
               <Card
                 key={invoice.id}
                 className="cursor-pointer transition-shadow hover:shadow-md"
@@ -122,7 +122,9 @@ export default function InvoicesPage() {
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="text-lg font-semibold">Invoice #{invoice.invoiceNumber}</h3>
+                          <h3 className="text-lg font-semibold">
+                            Invoice #{invoice.invoiceNumber}
+                          </h3>
                           <p className="text-sm text-muted-foreground">
                             Session: {invoice.sessionId}
                           </p>
@@ -133,7 +135,12 @@ export default function InvoicesPage() {
                       <div className="grid gap-2 md:grid-cols-3">
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>Issued: {format(new Date(invoice.issuedAt), 'PPP')}</span>
+                          <span>
+                            Issued:{' '}
+                            {invoice.issuedAt
+                              ? format(new Date(invoice.issuedAt), 'PPP')
+                              : format(new Date(invoice.createdAt), 'PPP')}
+                          </span>
                         </div>
                         {invoice.dueDate && (
                           <div className="flex items-center gap-2 text-sm">
@@ -150,7 +157,7 @@ export default function InvoicesPage() {
                       </div>
 
                       <div className="text-lg font-semibold">
-                        Total: ₹{invoice.totalAmount.toFixed(2)}
+                        Total: ₹{(invoice.totalAmount ?? invoice.total).toFixed(2)}
                       </div>
                     </div>
 
@@ -158,7 +165,7 @@ export default function InvoicesPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           handleDownload(invoice.id);
                         }}
@@ -177,7 +184,7 @@ export default function InvoicesPage() {
             <div className="mt-6 flex items-center justify-center gap-2">
               <Button
                 variant="outline"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
               >
                 Previous
@@ -187,7 +194,7 @@ export default function InvoicesPage() {
               </span>
               <Button
                 variant="outline"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
               >
                 Next

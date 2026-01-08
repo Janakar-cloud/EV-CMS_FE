@@ -1,10 +1,10 @@
 // Billing Service - Invoice, Transactions, Refunds, Reports
 import apiClient from './api-client';
-import type { Invoice, InvoiceItem, Refund } from '@/types/billing';
+import type { Invoice, InvoiceItem, Refund as BillingRefund } from '@/types/billing';
 
 const unwrap = <T>(payload: any): T => (payload?.data?.data ?? payload?.data ?? payload) as T;
 
-export type { Invoice, InvoiceItem, Refund };
+export type { Invoice, InvoiceItem, BillingRefund };
 
 export interface Transaction {
   id: string;
@@ -59,9 +59,16 @@ class BillingService {
   /**
    * Get all invoices
    */
-  async getInvoices(filters?: { userId?: string; status?: string; page?: number; limit?: number }): Promise<Invoice[]> {
+  async getInvoices(filters?: {
+    userId?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<Invoice[]> {
     try {
-      const response = await apiClient.get(`${BillingService.API_BASE}/invoices`, { params: filters });
+      const response = await apiClient.get(`${BillingService.API_BASE}/invoices`, {
+        params: filters,
+      });
       const data = unwrap<any>(response);
       return Array.isArray(data) ? data : (data.invoices ?? data.data ?? []);
     } catch (error) {
@@ -98,7 +105,9 @@ class BillingService {
    */
   async sendInvoice(invoiceId: string): Promise<{ message: string }> {
     try {
-      const response = await apiClient.post(`${BillingService.API_BASE}/invoices/${invoiceId}/send`);
+      const response = await apiClient.post(
+        `${BillingService.API_BASE}/invoices/${invoiceId}/send`
+      );
       return unwrap<{ message: string }>(response);
     } catch (error) {
       throw this.handleError(error);
@@ -108,9 +117,16 @@ class BillingService {
   /**
    * Get all transactions
    */
-  async getTransactions(filters?: { userId?: string; type?: string; page?: number; limit?: number }): Promise<Transaction[]> {
+  async getTransactions(filters?: {
+    userId?: string;
+    type?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<Transaction[]> {
     try {
-      const response = await apiClient.get(`${BillingService.API_BASE}/transactions`, { params: filters });
+      const response = await apiClient.get(`${BillingService.API_BASE}/transactions`, {
+        params: filters,
+      });
       const data = unwrap<any>(response);
       return Array.isArray(data) ? data : (data.transactions ?? data.data ?? []);
     } catch (error) {
@@ -121,9 +137,15 @@ class BillingService {
   /**
    * Get all refunds
    */
-  async getRefunds(filters?: { status?: string; page?: number; limit?: number }): Promise<Refund[]> {
+  async getRefunds(filters?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<Refund[]> {
     try {
-      const response = await apiClient.get(`${BillingService.API_BASE}/refunds`, { params: filters });
+      const response = await apiClient.get(`${BillingService.API_BASE}/refunds`, {
+        params: filters,
+      });
       const data = unwrap<any>(response);
       return Array.isArray(data) ? data : (data.refunds ?? data.data ?? []);
     } catch (error) {
@@ -160,7 +182,10 @@ class BillingService {
    */
   async processRefund(refundId: string, action: 'approve' | 'reject'): Promise<Refund> {
     try {
-      const response = await apiClient.put(`${BillingService.API_BASE}/refunds/${refundId}/process`, { action });
+      const response = await apiClient.put(
+        `${BillingService.API_BASE}/refunds/${refundId}/process`,
+        { action }
+      );
       return unwrap<Refund>(response);
     } catch (error) {
       throw this.handleError(error);
@@ -172,7 +197,9 @@ class BillingService {
    */
   async getDailyReport(date?: string): Promise<BillingReport> {
     try {
-      const response = await apiClient.get(`${BillingService.API_BASE}/reports/daily`, { params: { date } });
+      const response = await apiClient.get(`${BillingService.API_BASE}/reports/daily`, {
+        params: { date },
+      });
       return unwrap<BillingReport>(response);
     } catch (error) {
       throw this.handleError(error);
@@ -184,7 +211,9 @@ class BillingService {
    */
   async getMonthlyReport(month?: string, year?: number): Promise<BillingReport> {
     try {
-      const response = await apiClient.get(`${BillingService.API_BASE}/reports/monthly`, { params: { month, year } });
+      const response = await apiClient.get(`${BillingService.API_BASE}/reports/monthly`, {
+        params: { month, year },
+      });
       return unwrap<BillingReport>(response);
     } catch (error) {
       throw this.handleError(error);

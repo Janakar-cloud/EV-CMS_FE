@@ -2,25 +2,44 @@
 
 export interface Booking {
   id: string;
-  bookingNumber: string;
+  bookingNumber?: string;
+  bookingReference?: string;
   userId: string;
   stationId: string;
+  station?: { name: string; address?: string; id?: string };
   stationName?: string;
-  connectorId: string;
-  vehicleId: string;
-  status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
-  scheduledTime: string;
+  connectorId?: string;
+  connector?: { type?: string; power?: string; id?: string };
+  chargerId?: string;
+  vehicleId?: string;
+  vehicle?: {
+    id?: string;
+    name?: string;
+    make?: string;
+    model?: string;
+    registrationNumber?: string;
+  };
+  status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled' | 'in_progress';
+  scheduledTime?: string;
+  bookedFrom?: string;
+  bookedUntil?: string;
   startTime?: string;
   endTime?: string;
-  estimatedDuration: number; // minutes
+  estimatedDuration?: number; // minutes
   duration?: number; // actual minutes
   energyConsumed?: number; // kWh
   initialSoC?: number;
   finalSoC?: number;
-  cost: BookingCost;
+  cost?: BookingCost | number;
+  totalCost?: {
+    energyCost: number;
+    serviceFee: number;
+    tax: number;
+    totalAmount: number;
+  };
   rating?: BookingRating;
   cancellationReason?: string;
-  logs: BookingLog[];
+  logs?: BookingLog[];
   createdAt: string;
   updatedAt?: string;
 }
@@ -37,10 +56,12 @@ export interface BookingCost {
 }
 
 export interface BookingRating {
-  score: number;
+  score?: number;
+  rating?: number;
   review?: string;
+  comment?: string;
   images?: string[];
-  ratedAt: string;
+  ratedAt?: string;
 }
 
 export interface BookingLog {

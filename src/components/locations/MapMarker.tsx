@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useRef } from 'react';
-import { Charger } from '@/types';
+import type { Charger } from '@/types/charger';
 
 interface MapMarkerProps {
   map: google.maps.Map;
@@ -18,14 +18,16 @@ const MapMarker: React.FC<MapMarkerProps> = ({ map, charger, onClick, isSelected
         const baseSize = isDC ? 40 : 32; // DC chargers are larger markers
 
         let color = '#10B981'; // green for available
-        if (charger.status === 'occupied') color = '#F59E0B'; // yellow
-        else if (charger.status === 'fault') color = '#EF4444'; // red
+        if (charger.status === 'occupied')
+          color = '#F59E0B'; // yellow
+        else if (charger.status === 'faulted')
+          color = '#EF4444'; // red
         else if (charger.status === 'offline') color = '#6B7280'; // gray
 
         const svg = `
           <svg width="${baseSize}" height="${baseSize}" viewBox="0 0 ${baseSize} ${baseSize}" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="${baseSize/2}" cy="${baseSize/2}" r="${baseSize/2 - 2}" fill="${color}" stroke="white" stroke-width="2"/>
-            <text x="${baseSize/2}" y="${baseSize/2 + 1}" text-anchor="middle" fill="white" font-size="${baseSize/3}" font-weight="bold">
+            <circle cx="${baseSize / 2}" cy="${baseSize / 2}" r="${baseSize / 2 - 2}" fill="${color}" stroke="white" stroke-width="2"/>
+            <text x="${baseSize / 2}" y="${baseSize / 2 + 1}" text-anchor="middle" fill="white" font-size="${baseSize / 3}" font-weight="bold">
               ${isDC ? '⚡' : '🔌'}
             </text>
           </svg>
@@ -34,15 +36,19 @@ const MapMarker: React.FC<MapMarkerProps> = ({ map, charger, onClick, isSelected
         return {
           url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
           scaledSize: new google.maps.Size(baseSize, baseSize),
-          anchor: new google.maps.Point(baseSize/2, baseSize),
+          anchor: new google.maps.Point(baseSize / 2, baseSize),
         };
       };
 
+      const lat = charger.location.latitude;
+      const lng = charger.location.longitude;
+
+      if (typeof lat !== 'number' || typeof lng !== 'number') {
+        return;
+      }
+
       const marker = new google.maps.Marker({
-        position: {
-          lat: charger.location.latitude,
-          lng: charger.location.longitude,
-        },
+        position: { lat, lng },
         map,
         icon: getMarkerIcon(charger),
         title: `${charger.name} - ${charger.status}`,

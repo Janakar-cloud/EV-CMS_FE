@@ -1,43 +1,12 @@
 // Session Service - Complete session management
 import apiClient from './api-client';
+import type { CDR as SessionCDR, ChargingSession as ChargingSessionType } from '@/types/session';
 
-const unwrap = <T>(payload: any): T => (payload?.data?.data ?? payload?.data ?? payload) as T;
+const unwrap = <T = any>(payload: any): T => (payload?.data?.data ?? payload?.data ?? payload) as T;
 
-export interface Session {
-  id: string;
-  userId: string;
-  chargerId: string;
-  stationId: string;
-  connectorId: number;
-  startTime: string;
-  endTime: string | null;
-  energyConsumed: number;
-  status: 'active' | 'completed' | 'stopped' | 'failed';
-  cost: number;
-  meterStart: number;
-  meterEnd?: number;
-  createdAt: string;
-  updatedAt: string;
-}
+export type Session = ChargingSessionType;
 
-export interface CDR {
-  id: string;
-  sessionId: string;
-  userId: string;
-  chargerId: string;
-  locationId: string;
-  startDateTime: string;
-  stopDateTime: string;
-  duration: number;
-  energy: number;
-  currency: string;
-  totalCost: {
-    exclVat: number;
-    inclVat: number;
-  };
-  tariffId: string;
-  paymentStatus: string;
-}
+export type CDR = SessionCDR;
 
 export interface SessionFilters {
   userId?: string;
@@ -65,6 +34,21 @@ class SessionService {
     } catch (error) {
       throw this.handleError(error);
     }
+  }
+
+  /**
+   * UI convenience: list sessions with a normalized response shape
+   * (used by `src/app/sessions/page.tsx`)
+   */
+  async getSessions(
+    filters?: SessionFilters
+  ): Promise<{ data: Session[]; pagination: { totalPages: number } }> {
+    const raw = await this.listSessions(filters);
+
+    const data: Session[] = Array.isArray(raw) ? raw : (raw?.data ?? raw?.sessions ?? []);
+    const totalPages: number = raw?.pagination?.totalPages ?? raw?.pages ?? 1;
+
+    return { data, pagination: { totalPages } };
   }
 
   /**
@@ -110,11 +94,10 @@ class SessionService {
   /**
    * Stop session
    */
-  async stopSession(id: string, meterEnd: number): Promise<Session> {
+  async stopSession(id: string, meterEnd?: number): Promise<Session> {
     try {
-      const response = await apiClient.post(`${SessionService.API_BASE}/${id}/stop`, {
-        meterEnd
-      });
+      const body = meterEnd !== undefined ? { meterEnd } : {};
+      const response = await apiClient.post(`${SessionService.API_BASE}/${id}/stop`, body);
       return unwrap(response);
     } catch (error) {
       throw this.handleError(error);
@@ -139,7 +122,7 @@ class SessionService {
   async getSessionHistory(userId: string, filters?: SessionHistoryFilters) {
     try {
       const response = await apiClient.get(`${SessionService.API_BASE}/history`, {
-        params: { userId, ...(filters ?? {}) }
+        params: { userId, ...(filters ?? {}) },
       });
       return unwrap(response);
     } catch (error) {
@@ -153,7 +136,7 @@ class SessionService {
   async getSessionStats(userId?: string) {
     try {
       const response = await apiClient.get(`${SessionService.API_BASE}/stats`, {
-        params: userId ? { userId } : {}
+        params: userId ? { userId } : {},
       });
       return unwrap(response);
     } catch (error) {

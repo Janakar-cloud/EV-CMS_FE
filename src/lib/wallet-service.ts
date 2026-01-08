@@ -15,20 +15,26 @@ export interface Wallet {
 
 export interface WalletTransaction {
   id: string;
-  walletId: string;
+  walletId?: string;
   type: 'credit' | 'debit' | 'topup' | 'withdrawal' | 'refund';
   amount: number;
-  balanceBefore: number;
+  balanceBefore?: number;
   balanceAfter: number;
   description: string;
   reference?: string;
   status: 'pending' | 'completed' | 'failed';
-  timestamp: string;
+  timestamp?: string;
+  createdAt: string;
+  sessionId?: string;
+}
+
+export interface WalletWithTransactions extends Wallet {
+  transactions: WalletTransaction[];
 }
 
 export interface TopupRequest {
   amount: number;
-  paymentMethod: 'razorpay' | 'card' | 'upi';
+  paymentMethod?: 'razorpay' | 'card' | 'upi';
   paymentDetails?: any;
 }
 
@@ -61,12 +67,38 @@ class WalletService {
   }
 
   /**
-   * Get wallet by user ID
+   * Get wallet by user ID or current user's wallet
+   * If called with an object (e.g. { limit: 10 }), fetches current user wallet with transactions
    */
-  async getWallet(userId: string): Promise<Wallet> {
+  async getWallet(): Promise<Wallet>;
+  async getWallet(userId: string): Promise<Wallet>;
+  async getWallet(options: { limit?: number }): Promise<WalletWithTransactions>;
+  async getWallet(
+    userIdOrOptions?: string | { limit?: number }
+  ): Promise<Wallet | WalletWithTransactions> {
     try {
-      const response = await apiClient.get(`${WalletService.API_BASE}/${userId}`);
-      return unwrap<Wallet>(response);
+      let endpoint = WalletService.API_BASE;
+      let params: any = {};
+
+      if (typeof userIdOrOptions === 'string') {
+        endpoint = `${WalletService.API_BASE}/${userIdOrOptions}`;
+      } else if (userIdOrOptions && typeof userIdOrOptions === 'object') {
+        // Current user wallet with optional limit for transactions
+        endpoint = `${WalletService.API_BASE}/me`;
+        params = userIdOrOptions;
+      } else {
+        // No argument - fetch current user wallet
+        endpoint = `${WalletService.API_BASE}/me`;
+      }
+
+      const response = await apiClient.get(endpoint, { params });
+      const data = unwrap<any>(response);
+
+      // Normalize response to include transactions array for UI compatibility
+      return {
+        ...data,
+        transactions: data.transactions ?? [],
+      };
     } catch (error) {
       throw this.handleError(error);
     }
@@ -75,9 +107,31 @@ class WalletService {
   /**
    * Top-up wallet
    */
-  async topupWallet(userId: string, data: TopupRequest): Promise<{ transaction: WalletTransaction; wallet: Wallet }> {
+  async topupWallet(
+    data: TopupRequest
+  ): Promise<{ transaction: WalletTransaction; wallet: Wallet }>;
+  async topupWallet(
+    userId: string,
+    data: TopupRequest
+  ): Promise<{ transaction: WalletTransaction; wallet: Wallet }>;
+  async topupWallet(
+    userIdOrData: string | TopupRequest,
+    maybeData?: TopupRequest
+  ): Promise<{ transaction: WalletTransaction; wallet: Wallet }> {
     try {
-      const response = await apiClient.post(`${WalletService.API_BASE}/${userId}/topup`, data);
+      let endpoint: string;
+      let payload: TopupRequest;
+
+      if (typeof userIdOrData === 'string') {
+        endpoint = `${WalletService.API_BASE}/${userIdOrData}/topup`;
+        payload = maybeData!;
+      } else {
+        // Current user topup
+        endpoint = `${WalletService.API_BASE}/me/topup`;
+        payload = userIdOrData;
+      }
+
+      const response = await apiClient.post(endpoint, payload);
       return unwrap<{ transaction: WalletTransaction; wallet: Wallet }>(response);
     } catch (error) {
       throw this.handleError(error);
@@ -87,7 +141,10 @@ class WalletService {
   /**
    * Withdraw from wallet
    */
-  async withdrawFromWallet(userId: string, data: WithdrawRequest): Promise<{ transaction: WalletTransaction; wallet: Wallet }> {
+  async withdrawFromWallet(
+    userId: string,
+    data: WithdrawRequest
+  ): Promise<{ transaction: WalletTransaction; wallet: Wallet }> {
     try {
       const response = await apiClient.post(`${WalletService.API_BASE}/${userId}/withdraw`, data);
       return unwrap<{ transaction: WalletTransaction; wallet: Wallet }>(response);
@@ -99,11 +156,53 @@ class WalletService {
   /**
    * Get wallet transactions
    */
-  async getTransactions(userId: string, filters?: { type?: string; page?: number; limit?: number }): Promise<WalletTransaction[]> {
+  async getTransactions(filters?: {
+    type?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: WalletTransaction[]; pagination: { totalPages: number } }>;
+  async getTransactions(
+    userId: string,
+    filters?: { type?: string; page?: number; limit?: number }
+  ): Promise<WalletTransaction[]>;
+  async getTransactions(
+    userIdOrFilters?: string | { type?: string; page?: number; limit?: number },
+    maybeFilters?: { type?: string; page?: number; limit?: number }
+  ): Promise<
+    WalletTransaction[] | { data: WalletTransaction[]; pagination: { totalPages: number } }
+  > {
     try {
-      const response = await apiClient.get(`${WalletService.API_BASE}/${userId}/transactions`, { params: filters });
+      let endpoint: string;
+      let params: any = {};
+      let returnPaginated = false;
+
+      if (typeof userIdOrFilters === 'string') {
+        endpoint = `${WalletService.API_BASE}/${userIdOrFilters}/transactions`;
+        params = maybeFilters ?? {};
+      } else {
+        // Current user transactions with pagination
+        endpoint = `${WalletService.API_BASE}/me/transactions`;
+        params = userIdOrFilters ?? {};
+        returnPaginated = true;
+      }
+
+      const response = await apiClient.get(endpoint, { params });
       const data = unwrap<any>(response);
-      return Array.isArray(data) ? data : (data.transactions ?? data.data ?? []);
+      const transactions = Array.isArray(data) ? data : (data.transactions ?? data.data ?? []);
+
+      if (returnPaginated) {
+        return {
+          data: transactions,
+          pagination: {
+            totalPages:
+              data.pagination?.totalPages ??
+              data.totalPages ??
+              Math.ceil((data.total ?? transactions.length) / (params.limit ?? 20)),
+          },
+        };
+      }
+
+      return transactions;
     } catch (error) {
       throw this.handleError(error);
     }
@@ -112,7 +211,9 @@ class WalletService {
   /**
    * Transfer between wallets
    */
-  async transferBetweenWallets(data: TransferRequest): Promise<{ message: string; transaction: WalletTransaction }> {
+  async transferBetweenWallets(
+    data: TransferRequest
+  ): Promise<{ message: string; transaction: WalletTransaction }> {
     try {
       const response = await apiClient.post(`${WalletService.API_BASE}/transfer`, data);
       return unwrap<{ message: string; transaction: WalletTransaction }>(response);

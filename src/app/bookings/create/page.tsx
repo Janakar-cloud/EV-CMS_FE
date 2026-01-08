@@ -1,11 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { bookingService } from '@/lib/booking-service';
 import { stationService } from '@/lib/station-service';
 import { vehicleService } from '@/lib/vehicle-service';
@@ -15,7 +21,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, Calendar, Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function CreateBookingPage() {
+function CreateBookingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedStationId = searchParams.get('stationId');
@@ -40,11 +46,11 @@ export default function CreateBookingPage() {
   const loadData = async () => {
     try {
       const [stationsRes, vehiclesRes] = await Promise.all([
-        stationService.getStations({ status: 'active' }),
-        vehicleService.getVehicles(),
+        stationService.listStations({ status: 'active' }),
+        vehicleService.listVehicles(),
       ]);
-      setStations(stationsRes.data);
-      setVehicles(vehiclesRes.data);
+      setStations(stationsRes);
+      setVehicles(vehiclesRes.vehicles);
     } catch (error: any) {
       toast.error(error.message || 'Failed to load data');
     } finally {
@@ -52,16 +58,20 @@ export default function CreateBookingPage() {
     }
   };
 
-  const selectedStation = stations.find((s) => s.id === formData.stationId);
-  const availableConnectors = selectedStation?.connectors.filter(
-    (c) => c.status === 'available'
-  ) || [];
+  const selectedStation = stations.find(s => s.id === formData.stationId);
+  const availableConnectors =
+    selectedStation?.connectors.filter(c => c.status === 'available') || [];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.stationId || !formData.connectorType || !formData.vehicleId || 
-        !formData.scheduledDate || !formData.scheduledTime) {
+    if (
+      !formData.stationId ||
+      !formData.connectorType ||
+      !formData.vehicleId ||
+      !formData.scheduledDate ||
+      !formData.scheduledTime
+    ) {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -116,7 +126,7 @@ export default function CreateBookingPage() {
               <Label htmlFor="station">Charging Station *</Label>
               <Select
                 value={formData.stationId}
-                onValueChange={(value) =>
+                onValueChange={value =>
                   setFormData({ ...formData, stationId: value, connectorType: '' })
                 }
               >
@@ -124,7 +134,7 @@ export default function CreateBookingPage() {
                   <SelectValue placeholder="Select a station" />
                 </SelectTrigger>
                 <SelectContent>
-                  {stations.map((station) => (
+                  {stations.map(station => (
                     <SelectItem key={station.id} value={station.id}>
                       {station.name} - {station.city}
                     </SelectItem>
@@ -139,7 +149,7 @@ export default function CreateBookingPage() {
                 <Label htmlFor="connector">Connector Type *</Label>
                 <Select
                   value={formData.connectorType}
-                  onValueChange={(value) => setFormData({ ...formData, connectorType: value })}
+                  onValueChange={value => setFormData({ ...formData, connectorType: value })}
                 >
                   <SelectTrigger id="connector">
                     <SelectValue placeholder="Select connector type" />
@@ -167,7 +177,7 @@ export default function CreateBookingPage() {
               <Label htmlFor="vehicle">Vehicle *</Label>
               <Select
                 value={formData.vehicleId}
-                onValueChange={(value) => setFormData({ ...formData, vehicleId: value })}
+                onValueChange={value => setFormData({ ...formData, vehicleId: value })}
               >
                 <SelectTrigger id="vehicle">
                   <SelectValue placeholder="Select your vehicle" />
@@ -178,7 +188,7 @@ export default function CreateBookingPage() {
                       No vehicles added
                     </SelectItem>
                   ) : (
-                    vehicles.map((vehicle) => (
+                    vehicles.map(vehicle => (
                       <SelectItem key={vehicle.id} value={vehicle.id}>
                         {vehicle.make} {vehicle.model} ({vehicle.registrationNumber})
                       </SelectItem>
@@ -209,7 +219,7 @@ export default function CreateBookingPage() {
                   id="date"
                   type="date"
                   value={formData.scheduledDate}
-                  onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
+                  onChange={e => setFormData({ ...formData, scheduledDate: e.target.value })}
                   min={new Date().toISOString().split('T')[0]}
                 />
               </div>
@@ -220,13 +230,18 @@ export default function CreateBookingPage() {
                   id="time"
                   type="time"
                   value={formData.scheduledTime}
-                  onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
+                  onChange={e => setFormData({ ...formData, scheduledTime: e.target.value })}
                 />
               </div>
             </div>
 
             <div className="flex gap-4">
-              <Button type="button" variant="outline" className="flex-1" onClick={() => router.back()}>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => router.back()}
+              >
                 Cancel
               </Button>
               <Button
@@ -251,5 +266,19 @@ export default function CreateBookingPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function CreateBookingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[400px] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      }
+    >
+      <CreateBookingContent />
+    </Suspense>
   );
 }

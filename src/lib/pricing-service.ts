@@ -1,31 +1,18 @@
 ﻿// Pricing Service - Complete CRUD with real API integration
 import apiClient from './api-client';
-import { PricingRule } from '@/types/pricing';
+import type { PricingRule, PricingCalculation } from '@/types/pricing';
 
 const unwrap = <T>(payload: any): T => (payload?.data?.data ?? payload?.data ?? payload) as T;
 
 export interface PricingCalculateRequest {
   stationId: string;
   connectorType: string;
-  energyKWh: number;
-  durationMinutes: number;
+  energyKwh: number;
+  durationMinutes?: number;
   userSegment?: 'guest' | 'registered' | 'fleet' | 'employee' | 'resident';
 }
 
-export interface PricingCalculateResponse {
-  baseAmount: number;
-  energyCharge: number;
-  timeCharge?: number;
-  idleFee?: number;
-  discount?: number;
-  tax: number;
-  totalAmount: number;
-  currency: string;
-  breakdown: {
-    label: string;
-    amount: number;
-  }[];
-}
+export type PricingCalculateResponse = PricingCalculation;
 
 export interface PricingPreviewResponse {
   stationId: string;
@@ -61,7 +48,16 @@ class PricingService {
    */
   async calculatePrice(data: PricingCalculateRequest): Promise<PricingCalculateResponse> {
     try {
-      const response = await apiClient.post(`${PricingService.API_BASE}/calculate`, data);
+      const payload: Record<string, any> = {
+        stationId: data.stationId,
+        connectorType: data.connectorType,
+        energyKwh: data.energyKwh,
+        energyKWh: data.energyKwh,
+        durationMinutes: data.durationMinutes ?? 0,
+      };
+      if (data.userSegment) payload.userSegment = data.userSegment;
+
+      const response = await apiClient.post(`${PricingService.API_BASE}/calculate`, payload);
       return unwrap<PricingCalculateResponse>(response);
     } catch (error) {
       throw this.handleError(error);
@@ -117,7 +113,9 @@ class PricingService {
   /**
    * Create new pricing rule (protected: admin|brand)
    */
-  async createRule(data: Omit<PricingRule, 'id' | 'createdAt' | 'updatedAt'>): Promise<PricingRule> {
+  async createRule(
+    data: Omit<PricingRule, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<PricingRule> {
     try {
       const response = await apiClient.post(`${PricingService.API_BASE}/rules`, data);
       return unwrap<PricingRule>(response);
@@ -152,7 +150,7 @@ class PricingService {
   // ========================================
   // Legacy methods for backward compatibility
   // ========================================
-  
+
   /**
    * @deprecated Use listRules() instead
    */

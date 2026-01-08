@@ -4,7 +4,7 @@ import apiClient from './api-client';
 /**
  * Notification Service
  * Handles real-time notifications and system alerts
- * 
+ *
  * Backend API:
  * - GET /api/v1/notifications?type=system_alert&isRead=false&page=1&limit=20
  * - PATCH /api/v1/notifications/:id/read
@@ -48,7 +48,7 @@ export const notificationSchema = z.object({
   category: z.nativeEnum(NotificationCategory),
   read: z.boolean().default(false),
   actionUrl: z.string().url().optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 });
 
 export type Notification = z.infer<typeof notificationSchema>;
@@ -63,8 +63,8 @@ export interface NotificationResponse {
   read: boolean;
   actionUrl?: string;
   metadata?: Record<string, any>;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface NotificationListResponse {
@@ -261,7 +261,10 @@ class NotificationService {
    */
   async updatePreferences(preferences: any): Promise<any> {
     try {
-      const response = await apiClient.put(`${NotificationService.API_BASE}/preferences`, preferences);
+      const response = await apiClient.put(
+        `${NotificationService.API_BASE}/preferences`,
+        preferences
+      );
       return unwrap<any>(response);
     } catch (error) {
       console.error('Failed to update notification preferences:', error);
@@ -270,22 +273,14 @@ class NotificationService {
   }
 
   /**
-   * Mark all as read
-   */
-  async markAllAsRead(): Promise<{ message: string; updated: number }> {
-    try {
-      const response = await apiClient.put(`${NotificationService.API_BASE}/read-all`);
-      return unwrap<{ message: string; updated: number }>(response);
-    } catch (error) {
-      console.error('Failed to mark all notifications as read:', error);
-      throw error;
-    }
-  }
-
-  /**
    * Create bulk notifications (admin only)
    */
-  async createBulkNotifications(data: { userIds: string[]; title: string; message: string; type?: NotificationType }): Promise<{ message: string; created: number }> {
+  async createBulkNotifications(data: {
+    userIds: string[];
+    title: string;
+    message: string;
+    type?: NotificationType;
+  }): Promise<{ message: string; created: number }> {
     try {
       const response = await apiClient.post(`${NotificationService.API_BASE}/bulk`, data);
       return unwrap<{ message: string; created: number }>(response);

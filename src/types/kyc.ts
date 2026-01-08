@@ -23,7 +23,8 @@ export interface KYCStatus {
 export interface SubmitKYCRequest {
   documentType: 'aadhaar' | 'pan' | 'driving_license' | 'passport';
   documentNumber: string;
-  frontImage: string;
+  documentUrl?: string;
+  frontImage?: string;
   backImage?: string;
 }
 

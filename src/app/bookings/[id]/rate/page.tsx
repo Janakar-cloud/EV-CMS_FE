@@ -30,7 +30,7 @@ export default function RateBookingPage() {
 
     try {
       setSubmitting(true);
-      await bookingService.rateBooking(bookingId, { rating, comment });
+      await bookingService.rateBooking(bookingId, rating, comment, 'station');
       toast.success('Thank you for your feedback!');
       router.push(`/bookings/${bookingId}`);
     } catch (error: any) {
@@ -58,7 +58,7 @@ export default function RateBookingPage() {
             <div className="space-y-2">
               <Label>Rating *</Label>
               <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
+                {[1, 2, 3, 4, 5].map(star => (
                   <button
                     key={star}
                     type="button"
@@ -94,7 +94,7 @@ export default function RateBookingPage() {
                 id="comment"
                 placeholder="Tell us about your experience..."
                 value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                onChange={e => setComment(e.target.value)}
                 rows={5}
               />
             </div>

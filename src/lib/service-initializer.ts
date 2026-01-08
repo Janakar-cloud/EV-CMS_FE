@@ -103,7 +103,7 @@ class ServiceInitializer {
         name: 'Charger Service',
         test: async () => {
           try {
-            await chargerService.getChargers();
+            await chargerService.getAllChargers();
             return { success: true, message: 'Connected' };
           } catch (error: any) {
             // 401 means endpoint exists but needs auth - that's OK
@@ -132,7 +132,7 @@ class ServiceInitializer {
         name: 'Station Service',
         test: async () => {
           try {
-            await stationService.getStations();
+            await stationService.listStations();
             return { success: true, message: 'Connected' };
           } catch (error: any) {
             if (error.response?.status === 401) {
@@ -181,13 +181,9 @@ class ServiceInitializer {
       }
     }
 
-    const healthyCount = services.filter((s) => s.status === 'healthy').length;
+    const healthyCount = services.filter(s => s.status === 'healthy').length;
     const overallStatus =
-      healthyCount === services.length
-        ? 'healthy'
-        : healthyCount > 0
-        ? 'degraded'
-        : 'down';
+      healthyCount === services.length ? 'healthy' : healthyCount > 0 ? 'degraded' : 'down';
 
     return {
       backend: backendStatus,
@@ -203,12 +199,16 @@ class ServiceInitializer {
   printHealthCheck(health: SystemHealthCheck) {
     console.log('\n📊 ===== SYSTEM HEALTH CHECK =====');
     console.log(`⏰ Timestamp: ${health.timestamp}`);
-    console.log(`📡 Backend: ${health.backend.status === 'healthy' ? '✅' : '❌'} ${health.backend.message}`);
+    console.log(
+      `📡 Backend: ${health.backend.status === 'healthy' ? '✅' : '❌'} ${health.backend.message}`
+    );
     console.log(`\n📦 Services (${health.services.length} tested):`);
-    
-    health.services.forEach((service) => {
+
+    health.services.forEach(service => {
       const icon = service.status === 'healthy' ? '✅' : '❌';
-      console.log(`${icon} ${service.name}: ${service.message}${service.responseTime ? ` (${service.responseTime}ms)` : ''}`);
+      console.log(
+        `${icon} ${service.name}: ${service.message}${service.responseTime ? ` (${service.responseTime}ms)` : ''}`
+      );
     });
 
     console.log(`\n🎯 Overall Status: ${health.overallStatus.toUpperCase()}`);
@@ -229,20 +229,20 @@ class ServiceInitializer {
       vehicleService,
       userService,
       stationService,
-      
+
       // Billing & Payments
       billingService,
       walletService,
       paymentService,
       pricingService,
-      
+
       // Operations
       locationService,
       notificationService,
       maintenanceService,
       supportService,
       bookingService,
-      
+
       // Advanced
       partnerService,
       analyticsService,
@@ -282,7 +282,7 @@ class ServiceInitializer {
 
     console.log('\n📚 Available Services:');
     const services = this.getAllServices();
-    Object.keys(services).forEach((name) => {
+    Object.keys(services).forEach(name => {
       console.log(`   • ${name}`);
     });
 

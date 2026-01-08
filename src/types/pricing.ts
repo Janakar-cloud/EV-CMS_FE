@@ -48,7 +48,7 @@ export interface PricingRule {
   validity: {
     from: string;
     to: string | null;
-    days: ('Mon'|'Tue'|'Wed'|'Thu'|'Fri'|'Sat'|'Sun')[];
+    days: ('Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun')[];
   };
   base: {
     model: PricingModel;
@@ -66,4 +66,19 @@ export interface PricingRule {
   createdAt: string;
   updatedAt: string;
   active: boolean;
+}
+
+export interface PricingCalculation {
+  energyCost: number;
+  serviceFee: number;
+  parkingFee?: number;
+  tax: number;
+  taxRate: number;
+  discount?: number;
+  totalAmount: number;
+  breakdown?: {
+    baseRate: number;
+    isPeakHour?: boolean;
+    appliedRule?: string;
+  };
 }

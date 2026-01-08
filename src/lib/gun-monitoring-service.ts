@@ -15,7 +15,7 @@
   MonitoringConfig,
   ChargingCommand,
   ChargingCommandResponse,
-  EfficiencyLevel
+  EfficiencyLevel,
 } from '@/types/gun-monitoring';
 
 class GunMonitoringStorage {
@@ -44,7 +44,7 @@ class GunMonitoringStorage {
           voltage: 400,
           current: 118.75,
           powerFactor: 0.98,
-          chargingRatePercentage: 95
+          chargingRatePercentage: 95,
         },
         thermalMetrics: {
           powerModuleTemp: 45,
@@ -53,14 +53,14 @@ class GunMonitoringStorage {
           ambientTemp: 22,
           heatLoadPercentage: 65,
           coolingSystemStatus: 'normal',
-          thermalEfficiency: 0.94
+          thermalEfficiency: 0.94,
         },
         efficiencyMetrics: {
           chargingEfficiency: 0.979,
           conversionEfficiency: 0.985,
           energyLoss: 1000,
           efficiencyLevel: 'excellent',
-          efficiencyTrend: 'stable'
+          efficiencyTrend: 'stable',
         },
         activeSession: {
           sessionId: 'session-001',
@@ -73,7 +73,7 @@ class GunMonitoringStorage {
           targetEnergyAmount: 33.75,
           costPerKwh: 0.45,
           currentSessionCost: 8.91,
-          sessionStatus: 'active'
+          sessionStatus: 'active',
         },
         estimates: {
           estimatedTimeToComplete: 18,
@@ -82,7 +82,7 @@ class GunMonitoringStorage {
           remainingEnergyNeeded: 13.95,
           estimatedCostToComplete: 6.28,
           chargingProgress: 58.7,
-          averageChargingRate: 47.5
+          averageChargingRate: 47.5,
         },
         alerts: [
           {
@@ -92,11 +92,11 @@ class GunMonitoringStorage {
             message: 'Power module operating at normal temperature range',
             timestamp: new Date(Date.now() - 5 * 60 * 1000),
             acknowledged: true,
-            autoResolve: true
-          }
+            autoResolve: true,
+          },
         ],
         lastUpdated: new Date(),
-        historicalData: this.generateHistoricalData(25)
+        historicalData: this.generateHistoricalData(25),
       },
       {
         gunId: 'gun-1-2',
@@ -113,7 +113,7 @@ class GunMonitoringStorage {
           voltage: 0,
           current: 0,
           powerFactor: 1.0,
-          chargingRatePercentage: 0
+          chargingRatePercentage: 0,
         },
         thermalMetrics: {
           powerModuleTemp: 25,
@@ -122,22 +122,22 @@ class GunMonitoringStorage {
           ambientTemp: 22,
           heatLoadPercentage: 10,
           coolingSystemStatus: 'normal',
-          thermalEfficiency: 1.0
+          thermalEfficiency: 1.0,
         },
         efficiencyMetrics: {
           chargingEfficiency: 1.0,
           conversionEfficiency: 1.0,
           energyLoss: 0,
           efficiencyLevel: 'excellent',
-          efficiencyTrend: 'stable'
+          efficiencyTrend: 'stable',
         },
         estimates: {
           chargingProgress: 0,
-          averageChargingRate: 0
+          averageChargingRate: 0,
         },
         alerts: [],
         lastUpdated: new Date(),
-        historicalData: []
+        historicalData: [],
       },
       {
         gunId: 'gun-2-1',
@@ -154,7 +154,7 @@ class GunMonitoringStorage {
           voltage: 230,
           current: 31.3,
           powerFactor: 0.97,
-          chargingRatePercentage: 32.7
+          chargingRatePercentage: 32.7,
         },
         thermalMetrics: {
           powerModuleTemp: 38,
@@ -163,14 +163,14 @@ class GunMonitoringStorage {
           ambientTemp: 22,
           heatLoadPercentage: 35,
           coolingSystemStatus: 'normal',
-          thermalEfficiency: 0.97
+          thermalEfficiency: 0.97,
         },
         efficiencyMetrics: {
           chargingEfficiency: 0.966,
           conversionEfficiency: 0.975,
           energyLoss: 250,
           efficiencyLevel: 'excellent',
-          efficiencyTrend: 'stable'
+          efficiencyTrend: 'stable',
         },
         activeSession: {
           sessionId: 'session-002',
@@ -183,7 +183,7 @@ class GunMonitoringStorage {
           targetEnergyAmount: 52.86,
           costPerKwh: 0.35,
           currentSessionCost: 6.02,
-          sessionStatus: 'active'
+          sessionStatus: 'active',
         },
         estimates: {
           estimatedTimeToComplete: 295,
@@ -192,11 +192,11 @@ class GunMonitoringStorage {
           remainingEnergyNeeded: 35.66,
           estimatedCostToComplete: 12.48,
           chargingProgress: 32.5,
-          averageChargingRate: 7.1
+          averageChargingRate: 7.1,
         },
         alerts: [],
         lastUpdated: new Date(),
-        historicalData: this.generateHistoricalData(145, 7.2)
+        historicalData: this.generateHistoricalData(145, 7.2),
       },
       {
         gunId: 'gun-3-1',
@@ -213,7 +213,7 @@ class GunMonitoringStorage {
           voltage: 0,
           current: 0,
           powerFactor: 0,
-          chargingRatePercentage: 0
+          chargingRatePercentage: 0,
         },
         thermalMetrics: {
           powerModuleTemp: 75,
@@ -222,18 +222,18 @@ class GunMonitoringStorage {
           ambientTemp: 22,
           heatLoadPercentage: 95,
           coolingSystemStatus: 'fault',
-          thermalEfficiency: 0.5
+          thermalEfficiency: 0.5,
         },
         efficiencyMetrics: {
           chargingEfficiency: 0,
           conversionEfficiency: 0,
           energyLoss: 0,
           efficiencyLevel: 'critical',
-          efficiencyTrend: 'degrading'
+          efficiencyTrend: 'degrading',
         },
         estimates: {
           chargingProgress: 0,
-          averageChargingRate: 0
+          averageChargingRate: 0,
         },
         alerts: [
           {
@@ -243,7 +243,7 @@ class GunMonitoringStorage {
             message: 'Power module temperature exceeds safe operating limits',
             timestamp: new Date(Date.now() - 15 * 60 * 1000),
             acknowledged: false,
-            autoResolve: false
+            autoResolve: false,
           },
           {
             id: 'alert-cooling-fault-001',
@@ -252,7 +252,7 @@ class GunMonitoringStorage {
             message: 'Cooling system failure detected - charger shut down',
             timestamp: new Date(Date.now() - 12 * 60 * 1000),
             acknowledged: false,
-            autoResolve: false
+            autoResolve: false,
           },
           {
             id: 'alert-power-module-001',
@@ -261,12 +261,12 @@ class GunMonitoringStorage {
             message: 'Power module fault - charging disabled',
             timestamp: new Date(Date.now() - 10 * 60 * 1000),
             acknowledged: false,
-            autoResolve: false
-          }
+            autoResolve: false,
+          },
         ],
         lastUpdated: new Date(),
-        historicalData: []
-      }
+        historicalData: [],
+      },
     ];
 
     sampleGuns.forEach(gun => {
@@ -277,11 +277,11 @@ class GunMonitoringStorage {
   private generateHistoricalData(minutes: number, basePower: number = 47.5): HistoricalDataPoint[] {
     const data: HistoricalDataPoint[] = [];
     const now = Date.now();
-    
+
     for (let i = minutes; i >= 0; i--) {
       const timestamp = new Date(now - i * 60 * 1000);
       const powerVariation = (Math.random() - 0.5) * 0.1 * basePower;
-      const chargingWatts = Math.max(0, (basePower * 1000) + powerVariation * 1000);
+      const chargingWatts = Math.max(0, basePower * 1000 + powerVariation * 1000);
       const efficiency = Math.min(1, Math.max(0.8, 0.97 + (Math.random() - 0.5) * 0.03));
       const tempVariation = (Math.random() - 0.5) * 5;
       const temperature = Math.max(20, 35 + tempVariation);
@@ -292,30 +292,30 @@ class GunMonitoringStorage {
         chargingWatts,
         efficiency,
         temperature,
-        heatLoad
+        heatLoad,
       });
     }
-    
+
     return data;
   }
 
   startRealTimeUpdates(gunId: string) {
     if (this.activeUpdates.has(gunId)) return;
-    
+
     this.activeUpdates.add(gunId);
-    
+
     const updateInterval = setInterval(() => {
       this.simulateRealTimeUpdate(gunId);
     }, 5000);
-    
+
     this.updateIntervals.set(gunId, updateInterval);
   }
 
   stopRealTimeUpdates(gunId: string) {
     if (!this.activeUpdates.has(gunId)) return;
-    
+
     this.activeUpdates.delete(gunId);
-    
+
     const interval = this.updateIntervals.get(gunId);
     if (interval) {
       clearInterval(interval);
@@ -331,29 +331,47 @@ class GunMonitoringStorage {
     const tempVariation = (Math.random() - 0.5) * 2;
     const efficiencyVariation = (Math.random() - 0.5) * 0.01;
 
-    gun.powerMetrics.currentChargingWatts *= (1 + powerVariation);
+    gun.powerMetrics.currentChargingWatts *= 1 + powerVariation;
     gun.powerMetrics.outputPowerWatts = gun.powerMetrics.currentChargingWatts;
-    gun.powerMetrics.inputPowerWatts = gun.powerMetrics.currentChargingWatts / gun.efficiencyMetrics.chargingEfficiency;
-    gun.powerMetrics.chargingRatePercentage = (gun.powerMetrics.currentChargingWatts / gun.powerMetrics.maxOutputCapacity) * 100;
+    gun.powerMetrics.inputPowerWatts =
+      gun.powerMetrics.currentChargingWatts / gun.efficiencyMetrics.chargingEfficiency;
+    gun.powerMetrics.chargingRatePercentage =
+      (gun.powerMetrics.currentChargingWatts / gun.powerMetrics.maxOutputCapacity) * 100;
 
     gun.thermalMetrics.powerModuleTemp += tempVariation;
     gun.thermalMetrics.connectorTemp += tempVariation * 0.5;
-    gun.thermalMetrics.heatLoadPercentage = Math.min(100, (gun.powerMetrics.currentChargingWatts / 1000) * 1.5);
+    gun.thermalMetrics.heatLoadPercentage = Math.min(
+      100,
+      (gun.powerMetrics.currentChargingWatts / 1000) * 1.5
+    );
 
-    gun.efficiencyMetrics.chargingEfficiency = Math.min(1, Math.max(0.85, gun.efficiencyMetrics.chargingEfficiency + efficiencyVariation));
-    gun.efficiencyMetrics.energyLoss = gun.powerMetrics.inputPowerWatts - gun.powerMetrics.outputPowerWatts;
+    gun.efficiencyMetrics.chargingEfficiency = Math.min(
+      1,
+      Math.max(0.85, gun.efficiencyMetrics.chargingEfficiency + efficiencyVariation)
+    );
+    gun.efficiencyMetrics.energyLoss =
+      gun.powerMetrics.inputPowerWatts - gun.powerMetrics.outputPowerWatts;
 
     if (gun.activeSession) {
-      const sessionDurationMinutes = (Date.now() - gun.activeSession.sessionStartTime.getTime()) / (1000 * 60);
-      const energyDelivered = (gun.powerMetrics.currentChargingWatts / 1000) * (sessionDurationMinutes / 60);
+      const sessionDurationMinutes =
+        (Date.now() - gun.activeSession.sessionStartTime.getTime()) / (1000 * 60);
+      const energyDelivered =
+        (gun.powerMetrics.currentChargingWatts / 1000) * (sessionDurationMinutes / 60);
       gun.activeSession.energyDelivered = energyDelivered;
       gun.activeSession.currentSessionCost = energyDelivered * gun.activeSession.costPerKwh;
 
       if (gun.activeSession.targetEnergyAmount) {
-        gun.estimates.chargingProgress = (energyDelivered / gun.activeSession.targetEnergyAmount) * 100;
-        gun.estimates.remainingEnergyNeeded = Math.max(0, gun.activeSession.targetEnergyAmount - energyDelivered);
-        gun.estimates.estimatedTimeToComplete = (gun.estimates.remainingEnergyNeeded / (gun.powerMetrics.currentChargingWatts / 1000)) * 60; // minutes
-        gun.estimates.estimatedCostToComplete = gun.estimates.remainingEnergyNeeded * gun.activeSession.costPerKwh;
+        gun.estimates.chargingProgress =
+          (energyDelivered / gun.activeSession.targetEnergyAmount) * 100;
+        gun.estimates.remainingEnergyNeeded = Math.max(
+          0,
+          gun.activeSession.targetEnergyAmount - energyDelivered
+        );
+        gun.estimates.estimatedTimeToComplete =
+          (gun.estimates.remainingEnergyNeeded / (gun.powerMetrics.currentChargingWatts / 1000)) *
+          60; // minutes
+        gun.estimates.estimatedCostToComplete =
+          gun.estimates.remainingEnergyNeeded * gun.activeSession.costPerKwh;
       }
     }
 
@@ -362,7 +380,7 @@ class GunMonitoringStorage {
       chargingWatts: gun.powerMetrics.currentChargingWatts,
       efficiency: gun.efficiencyMetrics.chargingEfficiency,
       temperature: gun.thermalMetrics.powerModuleTemp,
-      heatLoad: gun.thermalMetrics.heatLoadPercentage
+      heatLoad: gun.thermalMetrics.heatLoadPercentage,
     });
 
     if (gun.historicalData.length > 100) {
@@ -378,10 +396,11 @@ class GunMonitoringStorage {
     const now = new Date();
 
     if (gun.thermalMetrics.powerModuleTemp > 70) {
-      const existingAlert = gun.alerts.find(alert => 
-        alert.type === 'temperature' && alert.severity === 'critical' && !alert.acknowledged
+      const existingAlert = gun.alerts.find(
+        alert =>
+          alert.type === 'temperature' && alert.severity === 'critical' && !alert.acknowledged
       );
-      
+
       if (!existingAlert) {
         gun.alerts.push({
           id: `alert-temp-${Date.now()}`,
@@ -390,16 +409,16 @@ class GunMonitoringStorage {
           message: `Power module temperature high: ${gun.thermalMetrics.powerModuleTemp.toFixed(1)}Â°C`,
           timestamp: now,
           acknowledged: false,
-          autoResolve: false
+          autoResolve: false,
         });
       }
     }
 
     if (gun.efficiencyMetrics.chargingEfficiency < 0.85) {
-      const existingAlert = gun.alerts.find(alert => 
-        alert.type === 'efficiency' && alert.severity === 'warning' && !alert.acknowledged
+      const existingAlert = gun.alerts.find(
+        alert => alert.type === 'efficiency' && alert.severity === 'warning' && !alert.acknowledged
       );
-      
+
       if (!existingAlert) {
         gun.alerts.push({
           id: `alert-eff-${Date.now()}`,
@@ -408,16 +427,16 @@ class GunMonitoringStorage {
           message: `Charging efficiency below optimal: ${(gun.efficiencyMetrics.chargingEfficiency * 100).toFixed(1)}%`,
           timestamp: now,
           acknowledged: false,
-          autoResolve: true
+          autoResolve: true,
         });
       }
     }
 
     if (gun.thermalMetrics.heatLoadPercentage > 85) {
-      const existingAlert = gun.alerts.find(alert => 
-        alert.type === 'temperature' && alert.severity === 'warning' && !alert.acknowledged
+      const existingAlert = gun.alerts.find(
+        alert => alert.type === 'temperature' && alert.severity === 'warning' && !alert.acknowledged
       );
-      
+
       if (!existingAlert) {
         gun.alerts.push({
           id: `alert-heat-${Date.now()}`,
@@ -426,7 +445,7 @@ class GunMonitoringStorage {
           message: `High heat load detected: ${gun.thermalMetrics.heatLoadPercentage.toFixed(1)}%`,
           timestamp: now,
           acknowledged: false,
-          autoResolve: true
+          autoResolve: true,
         });
       }
     }
@@ -456,7 +475,9 @@ class GunMonitoringStorage {
     }
 
     if (filters.efficiencyLevel && filters.efficiencyLevel.length > 0) {
-      filtered = filtered.filter(gun => filters.efficiencyLevel!.includes(gun.efficiencyMetrics.efficiencyLevel));
+      filtered = filtered.filter(gun =>
+        filters.efficiencyLevel!.includes(gun.efficiencyMetrics.efficiencyLevel)
+      );
     }
 
     if (filters.chargerId) {
@@ -468,23 +489,27 @@ class GunMonitoringStorage {
     }
 
     if (filters.hasActiveSession !== undefined) {
-      filtered = filtered.filter(gun => 
+      filtered = filtered.filter(gun =>
         filters.hasActiveSession ? !!gun.activeSession : !gun.activeSession
       );
     }
 
     if (filters.hasAlerts !== undefined) {
-      filtered = filtered.filter(gun => 
+      filtered = filtered.filter(gun =>
         filters.hasAlerts ? gun.alerts.length > 0 : gun.alerts.length === 0
       );
     }
 
     if (filters.minPower !== undefined) {
-      filtered = filtered.filter(gun => gun.powerMetrics.currentChargingWatts >= filters.minPower! * 1000);
+      filtered = filtered.filter(
+        gun => gun.powerMetrics.currentChargingWatts >= filters.minPower! * 1000
+      );
     }
 
     if (filters.maxPower !== undefined) {
-      filtered = filtered.filter(gun => gun.powerMetrics.currentChargingWatts <= filters.maxPower! * 1000);
+      filtered = filtered.filter(
+        gun => gun.powerMetrics.currentChargingWatts <= filters.maxPower! * 1000
+      );
     }
 
     return filtered;
@@ -496,7 +521,7 @@ class GunMonitoringStorage {
       return {
         success: false,
         commandId: '',
-        error: 'Gun not found'
+        error: 'Gun not found',
       };
     }
 
@@ -510,13 +535,13 @@ class GunMonitoringStorage {
           return {
             success: true,
             commandId,
-            message: 'Charging started successfully'
+            message: 'Charging started successfully',
           };
         }
         return {
           success: false,
           commandId,
-          error: 'Gun not available for charging'
+          error: 'Gun not available for charging',
         };
 
       case 'stop':
@@ -527,13 +552,13 @@ class GunMonitoringStorage {
           return {
             success: true,
             commandId,
-            message: 'Charging stopped successfully'
+            message: 'Charging stopped successfully',
           };
         }
         return {
           success: false,
           commandId,
-          error: 'Gun not currently charging'
+          error: 'Gun not currently charging',
         };
 
       case 'setLimit':
@@ -542,20 +567,20 @@ class GunMonitoringStorage {
           return {
             success: true,
             commandId,
-            message: 'Power limit updated successfully'
+            message: 'Power limit updated successfully',
           };
         }
         return {
           success: false,
           commandId,
-          error: 'Cannot set limit - gun not charging or invalid parameters'
+          error: 'Cannot set limit - gun not charging or invalid parameters',
         };
 
       default:
         return {
           success: false,
           commandId,
-          error: 'Unknown command'
+          error: 'Unknown command',
         };
     }
   }
@@ -576,7 +601,7 @@ export const gunMonitoringService = {
       const data = response?.data ?? response;
       const allMetrics = Array.isArray(data) ? data : (data?.metrics ?? []);
       const metrics = allMetrics.find((m: any) => m.gunId === gunId);
-      
+
       if (metrics) {
         return { success: true, metrics: { ...metrics, fromApi: true } };
       }
@@ -598,12 +623,12 @@ export const gunMonitoringService = {
       const response = await apiClient.get(`${GUN_METRICS_BASE}/guns/metrics`);
       const data = response?.data ?? response;
       const metrics = Array.isArray(data) ? data : (data?.metrics ?? data?.data ?? []);
-      
+
       if (metrics.length > 0) {
         return {
           success: true,
           metrics: metrics.map((m: any) => ({ ...m, fromApi: true })),
-          total: metrics.length
+          total: metrics.length,
         };
       }
       throw new Error('No metrics from API');
@@ -621,12 +646,12 @@ export const gunMonitoringService = {
       const response = await apiClient.get(`${GUN_METRICS_BASE}/${chargerId}/guns/metrics`);
       const data = response?.data ?? response;
       const metrics = Array.isArray(data) ? data : (data?.metrics ?? data?.data ?? []);
-      
+
       if (metrics.length > 0) {
         return {
           success: true,
           metrics: metrics.map((m: any) => ({ ...m, fromApi: true })),
-          total: metrics.length
+          total: metrics.length,
         };
       }
       throw new Error('No metrics from API');
@@ -644,12 +669,12 @@ export const gunMonitoringService = {
       const response = await apiClient.get(`${GUN_METRICS_BASE}/guns/metrics`, { params: filters });
       const data = response?.data ?? response;
       const metrics = Array.isArray(data) ? data : (data?.metrics ?? data?.data ?? []);
-      
+
       if (metrics.length > 0) {
         return {
           success: true,
           metrics: metrics.map((m: any) => ({ ...m, fromApi: true })),
-          total: metrics.length
+          total: metrics.length,
         };
       }
       throw new Error('No metrics from API');
@@ -665,8 +690,8 @@ export const gunMonitoringService = {
     try {
       // Try real API first
       const response = await apiClient.post(`${GUN_METRICS_BASE}/${command.gunId}/command`, {
-        command: command.type,
-        parameters: command.parameters
+        command: command.command,
+        parameters: command.parameters,
       });
       return response?.data ?? response;
     } catch (error) {
@@ -682,5 +707,5 @@ export const gunMonitoringService = {
 
   stopMonitoring: (gunId: string) => {
     gunMonitoringStorage.stopRealTimeUpdates(gunId);
-  }
+  },
 };

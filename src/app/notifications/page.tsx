@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { notificationService } from '@/lib/notification-service';
-import type { Notification } from '@/types/notification';
+import type { NotificationResponse } from '@/lib/notification-service';
 import { toast } from 'sonner';
 import { Bell, Loader2, Check, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
@@ -23,7 +23,7 @@ export default function NotificationsPage() {
     try {
       setLoading(true);
       const response = await notificationService.getNotifications({ page, limit: 20 });
-      setNotifications(response.data);
+      setNotifications(response.notifications);
     } catch (error: any) {
       toast.error(error.message || 'Failed to load notifications');
     } finally {
@@ -65,7 +65,7 @@ export default function NotificationsPage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-bold text-white">Notifications</h1>
-          <p className="text-slate-300 mt-1">Stay updated with important alerts</p>
+          <p className="mt-1 text-slate-300">Stay updated with important alerts</p>
         </div>
         <Button onClick={handleMarkAllAsRead} variant="outline">
           <Check className="mr-2 h-4 w-4" />
@@ -89,7 +89,7 @@ export default function NotificationsPage() {
         <Card>
           <CardContent className="p-0">
             <div className="divide-y">
-              {notifications.map((notification) => (
+              {notifications.map(notification => (
                 <div
                   key={notification.id}
                   className={`flex items-start gap-4 p-4 transition-colors hover:bg-muted ${

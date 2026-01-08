@@ -1,27 +1,8 @@
 // Vehicle Service - Complete CRUD with real API integration
 import apiClient from './api-client';
+import { Vehicle } from '@/types/vehicle';
 
 const unwrap = <T>(payload: any): T => (payload?.data?.data ?? payload?.data ?? payload) as T;
-
-export interface Vehicle {
-  _id: string;
-  id: string;
-  make: string;
-  model: string;
-  year: number;
-  batteryCapacity: number;
-  connectorTypes: string[];
-  registrationNumber: string;
-  nickname?: string;
-  ownerId: string;
-  ownerName?: string;
-  ownerEmail?: string;
-  vin?: string;
-  color?: string;
-  status: 'active' | 'inactive';
-  createdAt: string;
-  updatedAt: string;
-}
 
 export interface VehicleFilters {
   page?: number;
@@ -44,10 +25,11 @@ export interface CreateVehicleRequest {
   model: string;
   year: number;
   batteryCapacity: number;
-  connectorTypes: string[];
+  connectorTypes?: string[];
   registrationNumber: string;
+  isDefault?: boolean;
   nickname?: string;
-  ownerId: string;
+  ownerId?: string;
   vin?: string;
   color?: string;
 }
@@ -62,12 +44,12 @@ class VehicleService {
     try {
       const response = await apiClient.get(VehicleService.API_BASE, { params: filters });
       const data = unwrap<any>(response);
-      
+
       if (Array.isArray(data)) {
         const vehicles = data.map(this.normalizeVehicle);
         return { vehicles, total: vehicles.length, page: 1, pages: 1 };
       }
-      
+
       const vehicles = (data.vehicles ?? data.data ?? []).map(this.normalizeVehicle);
       return {
         vehicles,
@@ -146,11 +128,21 @@ class VehicleService {
    */
   async getChargingHistory(vehicleId: string): Promise<any[]> {
     try {
-      const response = await apiClient.get(`${VehicleService.API_BASE}/${vehicleId}/charging-history`);
+      const response = await apiClient.get(
+        `${VehicleService.API_BASE}/${vehicleId}/charging-history`
+      );
       return unwrap<any>(response);
     } catch (error) {
       throw this.handleError(error);
     }
+  }
+
+  /**
+   * Get vehicle history (alias for UI compatibility)
+   */
+  async getVehicleHistory(vehicleId: string): Promise<{ sessions: any[] }> {
+    const sessions = await this.getChargingHistory(vehicleId);
+    return { sessions: Array.isArray(sessions) ? sessions : [] };
   }
 
   /**

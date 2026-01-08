@@ -9,16 +9,29 @@ export interface Invoice {
   subtotal: number;
   tax: number;
   total: number;
+  totalAmount?: number;
+  discount?: number;
   status: 'pending' | 'paid' | 'overdue' | 'cancelled';
   dueDate: string;
+  issuedAt?: string;
   paidDate?: string;
+  paidAt?: string;
   createdAt: string;
+  sessionId?: string;
+  customer?: {
+    name: string;
+    email: string;
+    phone?: string;
+  };
+  paymentMethod?: string;
+  transactionId?: string;
 }
 
 export interface InvoiceItem {
   description: string;
-  quantity: number;
-  rate: number;
+  quantity?: number;
+  rate?: number;
+  unitPrice?: number;
   amount: number;
 }
 
@@ -31,6 +44,7 @@ export interface CreateInvoiceRequest {
 export interface Refund {
   id: string;
   transactionId: string;
+  invoiceId?: string;
   userId: string;
   amount: number;
   reason: string;

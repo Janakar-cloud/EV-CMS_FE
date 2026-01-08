@@ -45,6 +45,17 @@ export interface Charger {
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
+
+  // Optional UI/telemetry fields used by map/dashboard views
+  power?: number;
+  utilization?: number;
+  uptime?: number;
+  temperature?: number;
+  lastSeen?: Date | string;
+  networkStatus?: 'online' | 'offline';
+  maintenance?: {
+    alerts: Array<{ id?: string; message: string }>;
+  };
 }
 
 export interface CreateChargerRequest {

@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { billingService } from '@/lib/billing-service';
-import type { Refund } from '@/types/billing';
+import { billingService, Refund } from '@/lib/billing-service';
 import { toast } from 'sonner';
 import { DollarSign, Loader2, Calendar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -25,9 +24,9 @@ export default function RefundsPage() {
   const loadRefunds = async () => {
     try {
       setLoading(true);
-      const response = await billingService.getRefunds({ page, limit: 10 });
-      setRefunds(response.data);
-      setTotalPages(response.pagination.totalPages);
+      const refunds = await billingService.getRefunds({ page, limit: 10 });
+      setRefunds(refunds);
+      setTotalPages(Math.ceil(refunds.length / 10));
     } catch (error: any) {
       toast.error(error.message || 'Failed to load refunds');
     } finally {
@@ -42,8 +41,8 @@ export default function RefundsPage() {
       rejected: { variant: 'destructive', label: 'Rejected' },
       processed: { variant: 'outline', label: 'Processed' },
     };
-    const config = variants[status] || variants.pending;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    const config = variants[status] ?? variants['pending'];
+    return <Badge variant={config!.variant}>{config!.label}</Badge>;
   };
 
   return (
@@ -69,7 +68,7 @@ export default function RefundsPage() {
       ) : (
         <>
           <div className="space-y-4">
-            {refunds.map((refund) => (
+            {refunds.map(refund => (
               <Card key={refund.id}>
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
@@ -78,7 +77,7 @@ export default function RefundsPage() {
                         <div>
                           <h3 className="text-lg font-semibold">Refund #{refund.id}</h3>
                           <p className="text-sm text-muted-foreground">
-                            Invoice: {refund.invoiceId}
+                            Transaction: {refund.transactionId}
                           </p>
                         </div>
                         {getStatusBadge(refund.status)}
@@ -87,12 +86,12 @@ export default function RefundsPage() {
                       <div className="grid gap-2 md:grid-cols-2">
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>Requested: {format(new Date(refund.requestedAt), 'PPP')}</span>
+                          <span>Created: {format(new Date(refund.createdAt), 'PPP')}</span>
                         </div>
-                        {refund.processedAt && (
+                        {refund.updatedAt && (
                           <div className="flex items-center gap-2 text-sm">
                             <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <span>Processed: {format(new Date(refund.processedAt), 'PPP')}</span>
+                            <span>Updated: {format(new Date(refund.updatedAt), 'PPP')}</span>
                           </div>
                         )}
                       </div>
@@ -103,13 +102,12 @@ export default function RefundsPage() {
                       </div>
 
                       <div className="text-lg font-semibold">
-                        Amount: ₹{refund.amount.toFixed(2)}
+                        Amount: {refund.currency} {refund.amount.toFixed(2)}
                       </div>
 
-                      {refund.adminNotes && (
+                      {refund.processedBy && (
                         <div className="rounded-md bg-muted p-3">
-                          <p className="text-sm font-medium">Admin Notes:</p>
-                          <p className="text-sm text-muted-foreground">{refund.adminNotes}</p>
+                          <p className="text-sm font-medium">Processed by: {refund.processedBy}</p>
                         </div>
                       )}
                     </div>
@@ -124,7 +122,7 @@ export default function RefundsPage() {
             <div className="mt-6 flex items-center justify-center gap-2">
               <Button
                 variant="outline"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
               >
                 Previous
@@ -134,7 +132,7 @@ export default function RefundsPage() {
               </span>
               <Button
                 variant="outline"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
               >
                 Next

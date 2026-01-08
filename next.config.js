@@ -13,6 +13,12 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
-}
+  // Disable static generation for routes that depend on client-side state
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

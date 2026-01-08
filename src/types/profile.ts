@@ -1,5 +1,8 @@
 // User Profile Type Definitions
 
+import type { Vehicle } from './vehicle';
+import type { Wallet } from './wallet';
+
 export interface User {
   id: string;
   email: string;

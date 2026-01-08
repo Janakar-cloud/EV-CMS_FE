@@ -8,12 +8,15 @@ export interface Wallet {
 
 export interface Transaction {
   id: string;
-  type: 'credit' | 'debit';
+  type: 'credit' | 'debit' | 'topup' | 'withdrawal' | 'refund';
   amount: number;
   description: string;
   balanceAfter: number;
+  balanceBefore?: number;
   status: 'completed' | 'pending' | 'failed';
   sessionId?: string;
+  reference?: string;
+  timestamp?: string;
   createdAt: string;
 }
 

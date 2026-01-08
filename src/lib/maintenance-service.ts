@@ -186,7 +186,10 @@ class MaintenanceService {
   /**
    * Complete maintenance task
    */
-  async completeTask(id: string, data?: { notes?: string; cost?: number }): Promise<MaintenanceTask> {
+  async completeTask(
+    id: string,
+    data?: { notes?: string; cost?: number }
+  ): Promise<MaintenanceTask> {
     try {
       const response = await apiClient.put(`${MaintenanceService.API_BASE}/${id}/complete`, data);
       return unwrap<MaintenanceTask>(response);
@@ -200,23 +203,13 @@ class MaintenanceService {
    */
   async getStats(period?: string): Promise<any> {
     try {
-      const response = await apiClient.get(`${MaintenanceService.API_BASE}/stats`, { params: { period } });
+      const response = await apiClient.get(`${MaintenanceService.API_BASE}/stats`, {
+        params: { period },
+      });
       return unwrap<any>(response);
     } catch (error) {
       throw this.handleError(error);
     }
-  }
-
-  /**
-   * Mark task as completed
-   */
-  async completeTask(id: string, notes?: string, cost?: number): Promise<MaintenanceTask> {
-    return this.updateTask(id, {
-      status: 'completed',
-      completedDate: new Date().toISOString(),
-      notes,
-      cost,
-    });
   }
 
   /**
@@ -226,15 +219,6 @@ class MaintenanceService {
     return this.updateTask(id, {
       status: 'cancelled',
       notes,
-    });
-  }
-
-  /**
-   * Start task (mark as in progress)
-   */
-  async startTask(id: string): Promise<MaintenanceTask> {
-    return this.updateTask(id, {
-      status: 'in_progress',
     });
   }
 

@@ -71,9 +71,10 @@ export default function BookingDetailPage() {
       active: { variant: 'default', label: 'Active' },
       completed: { variant: 'outline', label: 'Completed' },
       cancelled: { variant: 'destructive', label: 'Cancelled' },
+      in_progress: { variant: 'default', label: 'In Progress' },
     };
-    const config = variants[status] || variants.pending;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    const config = variants[status] ?? variants['pending'];
+    return <Badge variant={config!.variant}>{config!.label}</Badge>;
   };
 
   return (
@@ -89,32 +90,34 @@ export default function BookingDetailPage() {
           <CardHeader>
             <div className="flex items-start justify-between">
               <div>
-                <CardTitle className="text-2xl">{booking.station.name}</CardTitle>
-                <CardDescription className="mt-2">
-                  Booking ID: {booking.id}
-                </CardDescription>
+                <CardTitle className="text-2xl">
+                  {booking.station?.name ?? booking.stationName ?? 'Station'}
+                </CardTitle>
+                <CardDescription className="mt-2">Booking ID: {booking.id}</CardDescription>
               </div>
               {getStatusBadge(booking.status)}
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">{booking.station.address}</span>
-            </div>
+            {booking.station?.address && (
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm">{booking.station.address}</span>
+              </div>
+            )}
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">
-                  {format(new Date(booking.scheduledTime), 'PPP')}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">
-                  {format(new Date(booking.scheduledTime), 'p')}
-                </span>
-              </div>
+              {booking.scheduledTime && (
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">{format(new Date(booking.scheduledTime), 'PPP')}</span>
+                </div>
+              )}
+              {booking.scheduledTime && (
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">{format(new Date(booking.scheduledTime), 'p')}</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -125,18 +128,18 @@ export default function BookingDetailPage() {
             <CardTitle>Connector Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Type</span>
-              <span className="font-medium">{booking.connector.type}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Power</span>
-              <span className="font-medium">{booking.connector.power} kW</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Status</span>
-              <Badge>{booking.connector.status}</Badge>
-            </div>
+            {booking.connector?.type && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Type</span>
+                <span className="font-medium">{booking.connector.type}</span>
+              </div>
+            )}
+            {booking.connector?.power && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Power</span>
+                <span className="font-medium">{booking.connector.power} kW</span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -147,16 +150,20 @@ export default function BookingDetailPage() {
               <CardTitle>Vehicle Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Model</span>
-                <span className="font-medium">
-                  {booking.vehicle.make} {booking.vehicle.model}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Registration</span>
-                <span className="font-medium">{booking.vehicle.registrationNumber}</span>
-              </div>
+              {booking.vehicle?.make && booking.vehicle?.model && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Model</span>
+                  <span className="font-medium">
+                    {booking.vehicle.make} {booking.vehicle.model}
+                  </span>
+                </div>
+              )}
+              {booking.vehicle?.registrationNumber && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Registration</span>
+                  <span className="font-medium">{booking.vehicle.registrationNumber}</span>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
@@ -221,10 +228,7 @@ export default function BookingDetailPage() {
             </Button>
           )}
           {booking.status === 'active' && (
-            <Button
-              className="flex-1"
-              onClick={() => router.push(`/sessions/${booking.id}`)}
-            >
+            <Button className="flex-1" onClick={() => router.push(`/sessions/${booking.id}`)}>
               <Zap className="mr-2 h-4 w-4" />
               View Active Session
             </Button>

@@ -1,7 +1,8 @@
 // Station Service - Complete CRUD with real API integration
 import apiClient from './api-client';
+import { Station } from '@/types/station';
 
-const unwrap = <T>(payload: any): T => (payload?.data?.data ?? payload?.data ?? payload) as T;
+const unwrap = <T = any>(payload: any): T => (payload?.data?.data ?? payload?.data ?? payload) as T;
 
 export interface Connector {
   connectorId: number;
@@ -10,33 +11,9 @@ export interface Connector {
   status: 'available' | 'occupied' | 'faulted';
 }
 
-export interface Station {
-  id: string;
-  name: string;
-  address: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  coordinates: {
-    latitude: number;
-    longitude: number;
-  };
-  chargers?: string[];
-  amenities: string[];
-  contactNumber: string;
-  operatingHours: {
-    open: string;
-    close: string;
-  };
-  totalChargers: number;
-  availableChargers: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface StationFilters {
   city?: string;
+  status?: string;
   latitude?: number;
   longitude?: number;
   radius?: number;
@@ -110,15 +87,29 @@ class StationService {
   /**
    * Find nearby stations
    */
-  async getNearbyStations(latitude: number, longitude: number, radius: number = 5): Promise<Station[]> {
+  async getNearbyStations(
+    latitude: number,
+    longitude: number,
+    radius: number = 5
+  ): Promise<Station[]> {
     try {
       const response = await apiClient.get(`${StationService.API_BASE}/nearby`, {
-        params: { latitude, longitude, radius }
+        params: { latitude, longitude, radius },
       });
       return unwrap<Station[]>(response);
     } catch (error) {
       throw this.handleError(error);
     }
+  }
+
+  /**
+   * UI convenience: find nearby stations with a normalized response shape
+   * (radius is typically passed in meters from UI)
+   */
+  async findNearby(params: { latitude: number; longitude: number; radius?: number }) {
+    const radiusKm = params.radius !== undefined ? params.radius / 1000 : undefined;
+    const stations = await this.getNearbyStations(params.latitude, params.longitude, radiusKm ?? 5);
+    return { stations };
   }
 
   /**
@@ -131,6 +122,13 @@ class StationService {
     } catch (error) {
       throw this.handleError(error);
     }
+  }
+
+  /**
+   * UI convenience alias for checkAvailability
+   */
+  async getAvailability(id: string) {
+    return this.checkAvailability(id);
   }
 
   private handleError(error: any): Error {

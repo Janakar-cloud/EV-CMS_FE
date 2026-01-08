@@ -1,19 +1,14 @@
 'use client';
 
+// Force dynamic rendering to avoid prerendering issues
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { dashboardService } from '@/lib/dashboard-service';
 import type { UserDashboardStats } from '@/types/dashboard';
 import { toast } from 'sonner';
-import {
-  Calendar,
-  Zap,
-  IndianRupee,
-  Activity,
-  Wallet,
-  MapPin,
-  Loader2,
-} from 'lucide-react';
+import { Calendar, Zap, IndianRupee, Activity, Wallet, MapPin, Loader2 } from 'lucide-react';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<UserDashboardStats | null>(null);
@@ -27,13 +22,14 @@ export default function DashboardPage() {
     try {
       const data = await dashboardService.getStats();
       // Map DashboardStats to UserDashboardStats format
-      const recentSessions = data?.recentSessions?.map((session: any) => ({
-        id: session._id || session.sessionId || '',
-        stationName: session.stationName || 'Unknown Station',
-        date: new Date().toISOString(),
-        energyConsumed: session.energyConsumption || 0,
-        cost: session.cost || 0,
-      })) ?? [];
+      const recentSessions =
+        data?.recentSessions?.map((session: any) => ({
+          id: session._id || session.sessionId || '',
+          stationName: session.stationName || 'Unknown Station',
+          date: new Date().toISOString(),
+          energyConsumed: session.energyConsumption || 0,
+          cost: session.cost || 0,
+        })) ?? [];
 
       const mappedStats: UserDashboardStats = {
         upcomingBookings: 0,
@@ -70,12 +66,12 @@ export default function DashboardPage() {
     <div className="container mx-auto p-6">
       <div className="mb-6">
         <h1 className="text-4xl font-bold text-white">Dashboard</h1>
-        <p className="text-slate-300 mt-1">Welcome back! Here's your overview</p>
+        <p className="mt-1 text-slate-300">Welcome back! Here's your overview</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-600 to-blue-700 border-blue-500">
+        <Card className="border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-bold text-blue-100">Upcoming Bookings</CardTitle>
             <Calendar className="h-4 w-4 text-blue-200" />
@@ -86,7 +82,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-emerald-600 to-emerald-700 border-emerald-500">
+        <Card className="border-emerald-500 bg-gradient-to-br from-emerald-600 to-emerald-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-bold text-emerald-100">Wallet Balance</CardTitle>
             <Wallet className="h-4 w-4 text-emerald-200" />
@@ -97,7 +93,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-600 to-purple-700 border-purple-500">
+        <Card className="border-purple-500 bg-gradient-to-br from-purple-600 to-purple-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-bold text-purple-100">This Month</CardTitle>
             <Activity className="h-4 w-4 text-purple-200" />
@@ -108,13 +104,15 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-amber-600 to-amber-700 border-amber-500">
+        <Card className="border-amber-500 bg-gradient-to-br from-amber-600 to-amber-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-bold text-amber-100">Energy Used</CardTitle>
             <Zap className="h-4 w-4 text-amber-200" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.thisMonth.energyConsumed.toFixed(1)}</div>
+            <div className="text-2xl font-bold text-white">
+              {stats.thisMonth.energyConsumed.toFixed(1)}
+            </div>
             <p className="text-xs text-amber-100">kWh this month</p>
           </CardContent>
         </Card>
@@ -189,7 +187,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {stats.recentSessions.map((session) => (
+              {stats.recentSessions.map(session => (
                 <div
                   key={session.id}
                   className="flex items-center justify-between border-b pb-4 last:border-0"
@@ -218,7 +216,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {stats.favoriteStations.map((station) => (
+              {stats.favoriteStations.map(station => (
                 <div
                   key={station.id}
                   className="flex items-center justify-between border-b pb-4 last:border-0"

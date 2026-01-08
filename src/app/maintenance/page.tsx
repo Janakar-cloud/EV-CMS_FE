@@ -37,7 +37,7 @@ export default function MaintenancePage() {
     try {
       setLoading(true);
       // Simulated data - replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
       setRecords([
         {
           id: '1',
@@ -72,24 +72,34 @@ export default function MaintenancePage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: any; label: string }> = {
+    const variants = {
       scheduled: { variant: 'secondary', label: 'Scheduled' },
       'in-progress': { variant: 'default', label: 'In Progress' },
       completed: { variant: 'outline', label: 'Completed' },
       cancelled: { variant: 'destructive', label: 'Cancelled' },
-    };
-    const config = variants[status] || variants.scheduled;
+    } as const;
+
+    const key = Object.prototype.hasOwnProperty.call(variants, status)
+      ? (status as keyof typeof variants)
+      : 'scheduled';
+
+    const config = variants[key];
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
   const getPriorityBadge = (priority: string) => {
-    const variants: Record<string, { variant: any; label: string }> = {
+    const variants = {
       low: { variant: 'outline', label: 'Low' },
       medium: { variant: 'secondary', label: 'Medium' },
       high: { variant: 'default', label: 'High' },
       urgent: { variant: 'destructive', label: 'Urgent' },
-    };
-    const config = variants[priority] || variants.medium;
+    } as const;
+
+    const key = Object.prototype.hasOwnProperty.call(variants, priority)
+      ? (priority as keyof typeof variants)
+      : 'medium';
+
+    const config = variants[key];
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
@@ -98,7 +108,7 @@ export default function MaintenancePage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-bold text-white">Maintenance Records</h1>
-          <p className="text-slate-300 mt-1">Track and manage all maintenance operations</p>
+          <p className="mt-1 text-slate-300">Track and manage all maintenance operations</p>
         </div>
         <Button onClick={() => router.push('/maintenance/schedule')}>
           <Plus className="mr-2 h-4 w-4" />
@@ -120,7 +130,7 @@ export default function MaintenancePage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {records.map((record) => (
+          {records.map(record => (
             <Card
               key={record.id}
               className="cursor-pointer transition-shadow hover:shadow-md"
@@ -144,17 +154,13 @@ export default function MaintenancePage() {
                       {record.scheduledDate && (
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
-                          <span>
-                            Scheduled: {format(new Date(record.scheduledDate), 'PPp')}
-                          </span>
+                          <span>Scheduled: {format(new Date(record.scheduledDate), 'PPp')}</span>
                         </div>
                       )}
                       {record.completedDate && (
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
-                          <span>
-                            Completed: {format(new Date(record.completedDate), 'PPp')}
-                          </span>
+                          <span>Completed: {format(new Date(record.completedDate), 'PPp')}</span>
                         </div>
                       )}
                     </div>
