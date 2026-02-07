@@ -22,5 +22,5 @@ vi.mock('next/navigation', () => ({
 }));
 
 // Mock environment variables
-process.env.NEXT_PUBLIC_API_URL = 'http://localhost:5000/api/v1';
-process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY = 'test-key';
+process.env.API_URL = 'http://localhost:5000/api/v1';
+process.env.GOOGLE_MAPS_API_KEY = 'test-key';

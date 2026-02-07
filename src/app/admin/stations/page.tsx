@@ -7,19 +7,7 @@ import { toast } from 'sonner';
 import { MapPin, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-
-interface StationVerification {
-  id: string;
-  stationId: string;
-  name: string;
-  address: string;
-  city: string;
-  ownerName: string;
-  ownerEmail: string;
-  documents: string[];
-  status: string;
-  submittedAt: string;
-}
+import adminStationsService, { type StationVerification } from '@/lib/admin-stations-service';
 
 export default function AdminStationsPage() {
   const [stations, setStations] = useState<StationVerification[]>([]);
@@ -32,9 +20,7 @@ export default function AdminStationsPage() {
   const loadStations = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/v1/admin/stations/verification?status=pending');
-      if (!response.ok) throw new Error('Failed to fetch station verifications');
-      const data = await response.json();
+      const data = await adminStationsService.listPendingVerifications();
       setStations(data.stations || []);
     } catch (error: any) {
       toast.error(error.message || 'Failed to load station verifications');
@@ -45,12 +31,7 @@ export default function AdminStationsPage() {
 
   const handleVerify = async (id: string, approved: boolean) => {
     try {
-      const response = await fetch(`/api/v1/admin/stations/verification/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: approved ? 'approved' : 'rejected' }),
-      });
-      if (!response.ok) throw new Error('Failed to update station verification');
+      await adminStationsService.updateVerification(id, approved);
       toast.success(`Station ${approved ? 'approved' : 'rejected'} successfully`);
       loadStations();
     } catch (error: any) {
@@ -79,7 +60,7 @@ export default function AdminStationsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {stations.map((station) => (
+          {stations.map(station => (
             <Card key={station.id}>
               <CardHeader>
                 <div className="flex items-start justify-between">

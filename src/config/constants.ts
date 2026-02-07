@@ -5,8 +5,8 @@
 
 // API Base URLs
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
-  OCPP_URL: process.env.NEXT_PUBLIC_OCPP_API_URL || 'http://localhost:8080',
+  BASE_URL: process.env.API_URL || 'http://localhost:5000/api/v1',
+  OCPP_URL: process.env.OCPP_API_URL || 'http://localhost:8080',
   TIMEOUT: 30000,
 } as const;
 
@@ -24,7 +24,7 @@ export const API_ENDPOINTS = {
     CHECK_AUTH: '/auth/check',
     REFRESH_TOKEN: '/auth/refresh-token',
   },
-  
+
   // Users
   USERS: {
     BASE: '/users',
@@ -34,7 +34,7 @@ export const API_ENDPOINTS = {
     KYC: (id: string) => `/users/${id}/kyc`,
     KYC_VERIFY: (id: string) => `/users/${id}/kyc/verify`,
   },
-  
+
   // Chargers
   CHARGERS: {
     BASE: '/chargers',
@@ -45,7 +45,7 @@ export const API_ENDPOINTS = {
     STOP_CHARGING: (id: string) => `/chargers/${id}/stop`,
     MONITORING: '/chargers/monitoring',
   },
-  
+
   // Locations
   LOCATIONS: {
     BASE: '/locations',
@@ -53,14 +53,14 @@ export const API_ENDPOINTS = {
     NEARBY: '/locations/nearby',
     SEARCH: '/locations/search',
   },
-  
+
   // Vehicles
   VEHICLES: {
     BASE: '/vehicles',
     BY_ID: (id: string) => `/vehicles/${id}`,
     BY_USER: (userId: string) => `/vehicles/user/${userId}`,
   },
-  
+
   // Pricing
   PRICING: {
     BASE: '/pricing',
@@ -68,7 +68,7 @@ export const API_ENDPOINTS = {
     BY_ID: (id: string) => `/pricing/rules/${id}`,
     CALCULATE: '/pricing/calculate',
   },
-  
+
   // Sessions
   SESSIONS: {
     BASE: '/sessions',
@@ -76,7 +76,7 @@ export const API_ENDPOINTS = {
     ACTIVE: '/sessions/active',
     HISTORY: '/sessions/history',
   },
-  
+
   // Analytics - NOTE: Uses /api/analytics (NOT /api/v1/analytics)
   ANALYTICS: {
     // These are relative to /api/analytics, not /api/v1
@@ -91,7 +91,7 @@ export const API_ENDPOINTS = {
     UTILIZATION: '/api/analytics/utilization',
     USERS: '/api/analytics/users',
   },
-  
+
   // Franchises
   FRANCHISES: {
     BASE: '/franchises',
@@ -99,7 +99,7 @@ export const API_ENDPOINTS = {
     ONBOARDING: '/franchises/onboarding',
     PERFORMANCE: '/franchises/performance',
   },
-  
+
   // Partners - NOTE: Uses /api/partners (NOT /api/v1/partners)
   PARTNERS: {
     // These are relative to /api/partners, not /api/v1
@@ -112,7 +112,7 @@ export const API_ENDPOINTS = {
     STATUS: (id: string) => `/api/partners/${id}/status`,
     ONBOARDING: '/api/partners/onboarding',
   },
-  
+
   // Roaming
   ROAMING: {
     BASE: '/roaming',
@@ -121,7 +121,7 @@ export const API_ENDPOINTS = {
     SESSIONS: '/roaming/sessions',
     SETTLEMENT: '/roaming/settlement',
   },
-  
+
   // Support
   SUPPORT: {
     TICKETS: '/support/tickets',
@@ -129,7 +129,7 @@ export const API_ENDPOINTS = {
     KNOWLEDGE_BASE: '/support/kb',
     CHAT: '/support/chat',
   },
-  
+
   // Reports
   REPORTS: {
     BASE: '/reports',
@@ -148,7 +148,7 @@ export const USER_ROLES = {
   CUSTOMER: 'customer',
 } as const;
 
-export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 
 // Charger Status
 export const CHARGER_STATUS = {
@@ -162,7 +162,7 @@ export const CHARGER_STATUS = {
   FINISHING: 'finishing',
 } as const;
 
-export type ChargerStatus = typeof CHARGER_STATUS[keyof typeof CHARGER_STATUS];
+export type ChargerStatus = (typeof CHARGER_STATUS)[keyof typeof CHARGER_STATUS];
 
 // Connector Types
 export const CONNECTOR_TYPES = {
@@ -173,7 +173,7 @@ export const CONNECTOR_TYPES = {
   GB_T: 'GB/T',
 } as const;
 
-export type ConnectorType = typeof CONNECTOR_TYPES[keyof typeof CONNECTOR_TYPES];
+export type ConnectorType = (typeof CONNECTOR_TYPES)[keyof typeof CONNECTOR_TYPES];
 
 // Session Status
 export const SESSION_STATUS = {
@@ -184,7 +184,7 @@ export const SESSION_STATUS = {
   CANCELLED: 'cancelled',
 } as const;
 
-export type SessionStatus = typeof SESSION_STATUS[keyof typeof SESSION_STATUS];
+export type SessionStatus = (typeof SESSION_STATUS)[keyof typeof SESSION_STATUS];
 
 // Payment Status
 export const PAYMENT_STATUS = {
@@ -195,7 +195,7 @@ export const PAYMENT_STATUS = {
   REFUNDED: 'refunded',
 } as const;
 
-export type PaymentStatus = typeof PAYMENT_STATUS[keyof typeof PAYMENT_STATUS];
+export type PaymentStatus = (typeof PAYMENT_STATUS)[keyof typeof PAYMENT_STATUS];
 
 // KYC Status
 export const KYC_STATUS = {
@@ -205,7 +205,7 @@ export const KYC_STATUS = {
   REJECTED: 'rejected',
 } as const;
 
-export type KYCStatus = typeof KYC_STATUS[keyof typeof KYC_STATUS];
+export type KYCStatus = (typeof KYC_STATUS)[keyof typeof KYC_STATUS];
 
 // Pricing Types
 export const PRICING_TYPES = {
@@ -215,7 +215,7 @@ export const PRICING_TYPES = {
   DYNAMIC: 'dynamic',
 } as const;
 
-export type PricingType = typeof PRICING_TYPES[keyof typeof PRICING_TYPES];
+export type PricingType = (typeof PRICING_TYPES)[keyof typeof PRICING_TYPES];
 
 // Date/Time Formats
 export const DATE_FORMATS = {
@@ -252,72 +252,72 @@ export const APP_ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   DASHBOARD: '/',
-  
+
   // Analytics
   ANALYTICS: '/analytics',
   ANALYTICS_REVENUE: '/analytics/revenue',
   ANALYTICS_USERS: '/analytics/users',
   ANALYTICS_UTILIZATION: '/analytics/utilization',
-  
+
   // Chargers
   CHARGERS: '/chargers',
   CHARGERS_ADD: '/chargers/add',
   CHARGERS_MONITORING: '/chargers/monitoring',
   CHARGERS_CONTROL: '/chargers/control',
   CHARGERS_MAINTENANCE: '/chargers/maintenance',
-  
+
   // Users
   USERS: '/users',
   USERS_ADD: '/users/add',
   USERS_KYC: '/users/kyc',
   USERS_BLOCKED: '/users/blocked',
-  
+
   // Vehicles
   VEHICLES: '/vehicles',
-  
+
   // Locations
   LOCATIONS: '/locations',
-  
+
   // Pricing
   PRICING_DYNAMIC: '/pricing/dynamic',
   PRICING_FRANCHISE: '/pricing/franchise',
   PRICING_RULES: '/pricing/rules',
-  
+
   // Franchises
   FRANCHISES: '/franchises',
   FRANCHISES_ONBOARDING: '/franchises/onboarding',
   FRANCHISES_PERFORMANCE: '/franchises/performance',
   FRANCHISES_STAFF: '/franchises/staff',
-  
+
   // Partners
   PARTNERS_AFFILIATE: '/partners/affiliate',
   PARTNERS_LOCATION: '/partners/location',
   PARTNERS_ONBOARDING: '/partners/onboarding',
   PARTNERS_SMART: '/partners/smart',
-  
+
   // Roaming
   ROAMING: '/roaming',
   ROAMING_PARTNERS: '/roaming/partners',
   ROAMING_AGREEMENTS: '/roaming/agreements',
   ROAMING_SESSIONS: '/roaming/sessions',
   ROAMING_SETTLEMENT: '/roaming/settlement',
-  
+
   // Monitoring
   MONITORING: '/monitoring',
-  
+
   // Reports
   REPORTS: '/reports',
   REPORTS_FINANCIAL: '/reports/financial',
   REPORTS_OPERATIONAL: '/reports/operational',
   REPORTS_COMPLIANCE: '/reports/compliance',
-  
+
   // Support
   SUPPORT: '/support',
   SUPPORT_TICKETS: '/support/tickets',
   SUPPORT_KB: '/support/kb',
   SUPPORT_CHAT: '/support/chat',
   SUPPORT_REPORTS: '/support/reports',
-  
+
   // Settings
   SETTINGS: '/settings',
 } as const;

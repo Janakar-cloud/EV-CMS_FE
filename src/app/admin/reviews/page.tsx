@@ -7,16 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Star, Flag, CheckCircle2, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-
-interface Review {
-  id: string;
-  stationName: string;
-  userName: string;
-  rating: number;
-  comment: string;
-  status: 'pending' | 'published' | 'flagged';
-  createdAt: string;
-}
+import adminReviewsService, { type Review } from '@/lib/admin-reviews-service';
 
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -30,9 +21,7 @@ export default function AdminReviewsPage() {
   const loadReviews = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/v1/admin/reviews');
-      if (!response.ok) throw new Error('Failed to fetch reviews');
-      const data = await response.json();
+      const data = await adminReviewsService.listReviews();
       setReviews(data.reviews || []);
     } catch (error: any) {
       toast.error(error.message || 'Failed to load reviews');
@@ -44,17 +33,10 @@ export default function AdminReviewsPage() {
   const handleModerate = async (id: string, action: 'publish' | 'flag') => {
     try {
       setProcessing(id);
-      const response = await fetch(`/api/v1/admin/reviews/${id}/moderate`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action }),
-      });
-      if (!response.ok) throw new Error('Failed to moderate review');
-      setReviews((prev) =>
-        prev.map((r) =>
-          r.id === id
-            ? { ...r, status: action === 'publish' ? 'published' : 'flagged' }
-            : r
+      await adminReviewsService.moderateReview(id, action);
+      setReviews(prev =>
+        prev.map(r =>
+          r.id === id ? { ...r, status: action === 'publish' ? 'published' : 'flagged' } : r
         )
       );
       toast.success(`Review ${action === 'publish' ? 'published' : 'flagged'}`);
@@ -66,7 +48,7 @@ export default function AdminReviewsPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-4">
+    <div className="container mx-auto space-y-4 p-6">
       <div>
         <h1 className="text-3xl font-bold">Review Moderation</h1>
         <p className="text-muted-foreground">Approve or flag user feedback across stations</p>
@@ -84,7 +66,7 @@ export default function AdminReviewsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {reviews.map((review) => (
+          {reviews.map(review => (
             <Card key={review.id}>
               <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>

@@ -47,6 +47,8 @@ export function useLocalStorage<T>(
         window.localStorage.removeItem(key);
         window.dispatchEvent(new Event('local-storage'));
       }
+      // Also clear the in-memory state so consumers see the removal immediately
+      setStoredValue(undefined as unknown as T);
     } catch (error) {
       console.error(`Error removing localStorage key "${key}":`, error);
     }

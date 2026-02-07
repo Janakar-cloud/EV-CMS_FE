@@ -4,26 +4,21 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Search, Loader2, UserCheck, UserX, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  role: string;
-  status: string;
-  kycStatus?: string;
-  createdAt: string;
-  lastLogin?: string;
-}
+import adminUsersService, { type AdminUserSummary } from '@/lib/admin-users-service';
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<AdminUserSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('all');
@@ -37,9 +32,12 @@ export default function AdminUsersPage() {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/v1/admin/users?page=${page}&role=${role}&status=${status}`);
-      if (!response.ok) throw new Error('Failed to fetch users');
-      const data = await response.json();
+      const data = await adminUsersService.listUsers({
+        page,
+        role,
+        status,
+        search,
+      });
       setUsers(data.users || []);
     } catch (error: any) {
       toast.error(error.message || 'Failed to load users');
@@ -51,12 +49,7 @@ export default function AdminUsersPage() {
   const handleToggleStatus = async (userId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
     try {
-      const response = await fetch(`/api/v1/admin/users/${userId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (!response.ok) throw new Error('Failed to update user status');
+      await adminUsersService.updateUserStatus(userId, newStatus);
       toast.success(`User ${newStatus === 'active' ? 'activated' : 'suspended'} successfully`);
       loadUsers();
     } catch (error: any) {
@@ -80,7 +73,7 @@ export default function AdminUsersPage() {
               <Input
                 placeholder="Search users..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={e => setSearch(e.target.value)}
                 className="pl-9"
               />
             </div>
@@ -118,7 +111,7 @@ export default function AdminUsersPage() {
         <Card>
           <CardContent className="p-0">
             <div className="divide-y">
-              {users.map((user) => (
+              {users.map(user => (
                 <div key={user.id} className="flex items-center justify-between p-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
@@ -136,9 +129,7 @@ export default function AdminUsersPage() {
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">{user.email}</p>
-                    {user.phone && (
-                      <p className="text-sm text-muted-foreground">{user.phone}</p>
-                    )}
+                    {user.phone && <p className="text-sm text-muted-foreground">{user.phone}</p>}
                     <div className="mt-1 flex gap-4 text-xs text-muted-foreground">
                       <span>Joined: {format(new Date(user.createdAt), 'PP')}</span>
                       {user.lastLogin && (

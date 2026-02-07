@@ -1,5 +1,4 @@
-import { apiClient } from './api-client';
-import type { AxiosError } from 'axios';
+import { apiClient, type AxiosError } from './api-client';
 
 // NOTE: Partners uses /api/partners (NOT /api/v1/partners)
 const PARTNERS_BASE = '/api/partners';
@@ -147,13 +146,13 @@ class PartnerService {
       return response;
     } catch (error) {
       const axiosError = error as AxiosError;
-      
+
       // If 404 or endpoint not available, return mock data for demo
       if (axiosError?.response?.status === 404 || !axiosError?.response) {
         console.warn('Partners endpoint not available, using mock data for demo');
-        
+
         let mockData = [...MOCK_SMART_PARTNERS, ...MOCK_AFFILIATE_PARTNERS];
-        
+
         if (options?.type === 'roaming') {
           mockData = mockData.filter(p => p.type === 'roaming');
         } else if (options?.type === 'network-operator') {
@@ -161,11 +160,11 @@ class PartnerService {
         } else if (options?.type === 'franchise') {
           mockData = mockData.filter(p => p.type === 'franchise');
         }
-        
+
         if (options?.status) {
           mockData = mockData.filter(p => p.status === options.status);
         }
-        
+
         return {
           partners: mockData,
           total: mockData.length,
@@ -173,7 +172,7 @@ class PartnerService {
           pages: 1,
         };
       }
-      
+
       console.error('Failed to fetch partners:', error);
       throw error;
     }
@@ -197,10 +196,7 @@ class PartnerService {
    */
   async updatePartner(partnerId: string, data: Partial<PartnerRequest>): Promise<Partner> {
     try {
-      const response = await apiClient.put<Partner>(
-        `${this.baseEndpoint}/${partnerId}`,
-        data
-      );
+      const response = await apiClient.put<Partner>(`${this.baseEndpoint}/${partnerId}`, data);
       return response;
     } catch (error) {
       console.error(`Failed to update partner ${partnerId}:`, error);
@@ -245,9 +241,7 @@ class PartnerService {
    */
   async revokePartner(partnerId: string): Promise<Partner> {
     try {
-      const response = await apiClient.put<Partner>(
-        `${this.baseEndpoint}/${partnerId}/revoke`
-      );
+      const response = await apiClient.put<Partner>(`${this.baseEndpoint}/${partnerId}/revoke`);
       return response;
     } catch (error) {
       console.error(`Failed to revoke partner ${partnerId}:`, error);
@@ -260,9 +254,7 @@ class PartnerService {
    */
   async reactivatePartner(partnerId: string): Promise<Partner> {
     try {
-      const response = await apiClient.put<Partner>(
-        `${this.baseEndpoint}/${partnerId}/reactivate`
-      );
+      const response = await apiClient.put<Partner>(`${this.baseEndpoint}/${partnerId}/reactivate`);
       return response;
     } catch (error) {
       console.error(`Failed to reactivate partner ${partnerId}:`, error);
@@ -273,12 +265,14 @@ class PartnerService {
   /**
    * Update partner status (Admin only)
    */
-  async updatePartnerStatus(partnerId: string, status: 'pending' | 'active' | 'suspended'): Promise<Partner> {
+  async updatePartnerStatus(
+    partnerId: string,
+    status: 'pending' | 'active' | 'suspended'
+  ): Promise<Partner> {
     try {
-      const response = await apiClient.put<Partner>(
-        `${this.baseEndpoint}/${partnerId}/status`,
-        { status }
-      );
+      const response = await apiClient.put<Partner>(`${this.baseEndpoint}/${partnerId}/status`, {
+        status,
+      });
       return response;
     } catch (error) {
       console.error(`Failed to update partner status ${partnerId}:`, error);
@@ -371,7 +365,9 @@ class PartnerService {
     } catch (error) {
       // Already handled in getPartners with mock data fallback
       console.error('Failed to fetch affiliate partners:', error);
-      return status ? MOCK_AFFILIATE_PARTNERS.filter(p => p.status === status) : MOCK_AFFILIATE_PARTNERS;
+      return status
+        ? MOCK_AFFILIATE_PARTNERS.filter(p => p.status === status)
+        : MOCK_AFFILIATE_PARTNERS;
     }
   }
 

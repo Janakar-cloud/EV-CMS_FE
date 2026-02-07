@@ -26,8 +26,8 @@ const LocationMap: React.FC<LocationMapProps> = ({
   const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log('LocationMap: API Key present:', !!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
-    console.log('LocationMap: API Key value:', process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
+    console.log('LocationMap: API Key present:', !!process.env.GOOGLE_MAPS_API_KEY);
+    console.log('LocationMap: API Key value:', process.env.GOOGLE_MAPS_API_KEY);
   }, []);
 
   const filteredChargers = React.useMemo(() => {
@@ -131,14 +131,13 @@ const LocationMap: React.FC<LocationMapProps> = ({
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">Map failed to load</h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
-                  process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY === 'YOUR_GOOGLE_MAPS_API_KEY_HERE'
+                  {!process.env.GOOGLE_MAPS_API_KEY ||
+                  process.env.GOOGLE_MAPS_API_KEY === 'YOUR_GOOGLE_MAPS_API_KEY_HERE'
                     ? 'Google Maps API key is not configured. Please add a valid API key to your .env.local file.'
                     : 'Please check your internet connection and try again.'}
                 </p>
-                {(!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
-                  process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ===
-                    'YOUR_GOOGLE_MAPS_API_KEY_HERE') && (
+                {(!process.env.GOOGLE_MAPS_API_KEY ||
+                  process.env.GOOGLE_MAPS_API_KEY === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') && (
                   <div className="mt-4 text-left">
                     <p className="mb-2 text-xs text-gray-600">To get a Google Maps API key:</p>
                     <ol className="list-inside list-decimal space-y-1 text-xs text-gray-600">
@@ -156,9 +155,7 @@ const LocationMap: React.FC<LocationMapProps> = ({
                       <li>Create a new project or select existing one</li>
                       <li>Enable the &quot;Maps JavaScript API&quot;</li>
                       <li>Create credentials (API Key)</li>
-                      <li>
-                        Add the key to your .env.local file as NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-                      </li>
+                      <li>Add the key to your .env.local file as GOOGLE_MAPS_API_KEY</li>
                     </ol>
                   </div>
                 )}
@@ -232,8 +229,8 @@ const LocationMap: React.FC<LocationMapProps> = ({
 
   return (
     <div className={`h-full w-full ${className}`}>
-      {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
-      process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY === 'YOUR_GOOGLE_MAPS_API_KEY_HERE' ? (
+      {!process.env.GOOGLE_MAPS_API_KEY ||
+      process.env.GOOGLE_MAPS_API_KEY === 'YOUR_GOOGLE_MAPS_API_KEY_HERE' ? (
         <div className="flex h-full flex-col">
           <div className="flex h-1/2 items-center justify-center bg-gray-100">
             <div className="p-6 text-center">
@@ -271,7 +268,7 @@ const LocationMap: React.FC<LocationMapProps> = ({
                     </a>
                   </li>
                   <li>Enable &quot;Maps JavaScript API&quot;</li>
-                  <li>Update NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in .env.local</li>
+                  <li>Update GOOGLE_MAPS_API_KEY in .env.local</li>
                 </ol>
               </div>
             </div>
@@ -338,7 +335,7 @@ const LocationMap: React.FC<LocationMapProps> = ({
         </div>
       ) : (
         <Wrapper
-          apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+          apiKey={process.env.GOOGLE_MAPS_API_KEY}
           libraries={['places', 'geometry']}
           render={renderMap}
           callback={status => {

@@ -16,15 +16,17 @@ export async function GET(request: NextRequest) {
 
     // Check environment variables
     checks.environment = {
-      hasApiUrl: !!process.env.NEXT_PUBLIC_API_URL,
-      hasSentryDSN: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
+      hasApiUrl: !!process.env.API_URL,
+      hasSentryDSN: !!process.env.SENTRY_DSN,
       nodeEnv: process.env.NODE_ENV,
     };
 
     // Overall status
-    const allHealthy = Object.values(checks).every((check) => {
+    const allHealthy = Object.values(checks).every(check => {
       if (typeof check === 'object' && check !== null) {
-        return check.status === 'healthy' || check.status === undefined || check.hasApiUrl !== false;
+        return (
+          check.status === 'healthy' || check.status === undefined || check.hasApiUrl !== false
+        );
       }
       return true;
     });
@@ -58,7 +60,7 @@ async function checkAPIHealth() {
   const startTime = Date.now();
   try {
     // Try to reach the API's health endpoint
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const apiUrl = process.env.API_URL;
     if (!apiUrl) {
       return { status: 'unconfigured', responseTime: 0 };
     }

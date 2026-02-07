@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from '@sentry/nextjs';
 
 /**
  * Initialize Sentry for error tracking
@@ -10,7 +10,7 @@ export function initializeSentry() {
   }
 
   Sentry.init({
-    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    dsn: process.env.SENTRY_DSN,
     environment: process.env.NODE_ENV,
     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
     debug: process.env.NODE_ENV === 'development',
@@ -35,7 +35,10 @@ export function captureException(error: Error | string, context?: Record<string,
 /**
  * Capture a message in Sentry
  */
-export function captureMessage(message: string, level: 'fatal' | 'error' | 'warning' | 'info' | 'debug' = 'info') {
+export function captureMessage(
+  message: string,
+  level: 'fatal' | 'error' | 'warning' | 'info' | 'debug' = 'info'
+) {
   Sentry.captureMessage(message, level);
 }
 
@@ -60,7 +63,11 @@ export function clearUserContext() {
 /**
  * Add breadcrumb for tracking
  */
-export function addBreadcrumb(message: string, data?: Record<string, any>, category: string = 'custom') {
+export function addBreadcrumb(
+  message: string,
+  data?: Record<string, any>,
+  category: string = 'custom'
+) {
   Sentry.addBreadcrumb({
     message,
     data,

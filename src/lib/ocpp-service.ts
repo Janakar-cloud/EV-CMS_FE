@@ -1,7 +1,7 @@
 ﻿// ⚠️ IMPORTANT: This service uses REST API (port 5000), NOT direct OCPP WebSocket (port 8080)
 // OCPP WebSocket is for charging stations only. Frontend uses REST API for all operations.
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+import apiClient from './api-client';
 
 export interface OCPPCommandRequest {
   chargerId: string;
@@ -20,11 +20,8 @@ export interface OCPPCommandResponse {
 
 export class OCPPService {
   private static instance: OCPPService;
-  private baseUrl: string;
 
-  constructor() {
-    this.baseUrl = API_BASE_URL;
-  }
+  constructor() {}
 
   public static getInstance(): OCPPService {
     if (!OCPPService.instance) {
@@ -44,12 +41,12 @@ export class OCPPService {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
-    
+
     const token = this.getAuthToken();
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     return headers;
   }
 
@@ -59,29 +56,19 @@ export class OCPPService {
    */
   async executeCommand(request: OCPPCommandRequest): Promise<OCPPCommandResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/chargers/${request.chargerId}/command`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({
-          command: request.command,
-          connectorId: request.connectorId,
-          parameters: request.parameters
-        })
+      const data = await apiClient.post(`/chargers/${request.chargerId}/command`, {
+        command: request.command,
+        connectorId: request.connectorId,
+        parameters: request.parameters,
       });
 
-      if (!response.ok) {
-        // Backend returned error - will fallback to mock response
-        throw new Error(`Backend unavailable (status: ${response.status})`);
-      }
-
-      const data = await response.json();
-      return data.data || data;
+      return (data as any).data || data;
     } catch (error) {
       // Don't spam console - backend is likely not running
       if (process.env.NODE_ENV === 'development') {
         console.warn('OCPP Service: Backend unavailable, using simulated response');
       }
-      
+
       // Fallback to mock response for development
       await new Promise(resolve => setTimeout(resolve, 1500));
       const scenarios = this.getCommandScenarios(request.command);
@@ -89,15 +76,15 @@ export class OCPPService {
         success: false,
         status: 'Rejected' as const,
         message: 'Command execution failed',
-        data: null
+        data: null,
       };
-      
+
       return {
         success: scenario.success,
         messageId: this.generateMessageId(),
         status: scenario.status,
         message: scenario.message,
-        data: scenario.data
+        data: scenario.data,
       };
     }
   }
@@ -105,38 +92,115 @@ export class OCPPService {
   private getCommandScenarios(command: string) {
     const baseScenarios = {
       'Start Charging': [
-        { success: true, status: 'Accepted' as const, message: 'Charging session started successfully', data: { sessionId: this.generateSessionId() } },
-        { success: false, status: 'Rejected' as const, message: 'Charger is not available', data: null },
-        { success: false, status: 'Rejected' as const, message: 'No vehicle connected', data: null }
+        {
+          success: true,
+          status: 'Accepted' as const,
+          message: 'Charging session started successfully',
+          data: { sessionId: this.generateSessionId() },
+        },
+        {
+          success: false,
+          status: 'Rejected' as const,
+          message: 'Charger is not available',
+          data: null,
+        },
+        {
+          success: false,
+          status: 'Rejected' as const,
+          message: 'No vehicle connected',
+          data: null,
+        },
       ],
       'Stop Charging': [
-        { success: true, status: 'Accepted' as const, message: 'Charging session stopped', data: { finalEnergy: Math.random() * 50 + 10 } },
-        { success: false, status: 'Rejected' as const, message: 'No active session found', data: null }
+        {
+          success: true,
+          status: 'Accepted' as const,
+          message: 'Charging session stopped',
+          data: { finalEnergy: Math.random() * 50 + 10 },
+        },
+        {
+          success: false,
+          status: 'Rejected' as const,
+          message: 'No active session found',
+          data: null,
+        },
       ],
       'Reset Charger': [
-        { success: true, status: 'Accepted' as const, message: 'Charger reset initiated', data: { resetType: 'Soft' } },
-        { success: false, status: 'NotSupported' as const, message: 'Reset not supported in current state', data: null }
+        {
+          success: true,
+          status: 'Accepted' as const,
+          message: 'Charger reset initiated',
+          data: { resetType: 'Soft' },
+        },
+        {
+          success: false,
+          status: 'NotSupported' as const,
+          message: 'Reset not supported in current state',
+          data: null,
+        },
       ],
       'Reboot Charger': [
-        { success: true, status: 'Accepted' as const, message: 'Charger reboot initiated', data: { estimatedDowntime: 180 } },
-        { success: false, status: 'Rejected' as const, message: 'Cannot reboot during active session', data: null }
+        {
+          success: true,
+          status: 'Accepted' as const,
+          message: 'Charger reboot initiated',
+          data: { estimatedDowntime: 180 },
+        },
+        {
+          success: false,
+          status: 'Rejected' as const,
+          message: 'Cannot reboot during active session',
+          data: null,
+        },
       ],
       'Unlock Connector': [
-        { success: true, status: 'Accepted' as const, message: 'Connector unlocked successfully', data: { connectorId: 1 } },
-        { success: false, status: 'Rejected' as const, message: 'Connector already unlocked', data: null }
+        {
+          success: true,
+          status: 'Accepted' as const,
+          message: 'Connector unlocked successfully',
+          data: { connectorId: 1 },
+        },
+        {
+          success: false,
+          status: 'Rejected' as const,
+          message: 'Connector already unlocked',
+          data: null,
+        },
       ],
       'Clear Cache': [
-        { success: true, status: 'Accepted' as const, message: 'Authorization cache cleared', data: { clearedEntries: Math.floor(Math.random() * 100) } }
+        {
+          success: true,
+          status: 'Accepted' as const,
+          message: 'Authorization cache cleared',
+          data: { clearedEntries: Math.floor(Math.random() * 100) },
+        },
       ],
       'Update Firmware': [
-        { success: true, status: 'Accepted' as const, message: 'Firmware update initiated', data: { version: '2.1.6', estimatedTime: 600 } },
-        { success: false, status: 'Rejected' as const, message: 'Update already in progress', data: null }
-      ]
+        {
+          success: true,
+          status: 'Accepted' as const,
+          message: 'Firmware update initiated',
+          data: { version: '2.1.6', estimatedTime: 600 },
+        },
+        {
+          success: false,
+          status: 'Rejected' as const,
+          message: 'Update already in progress',
+          data: null,
+        },
+      ],
     };
 
-    return baseScenarios[command as keyof typeof baseScenarios] || [
-      { success: true, status: 'Accepted' as const, message: 'Command executed successfully', data: null }
-    ];
+    return (
+      baseScenarios[command as keyof typeof baseScenarios] || [
+        {
+          success: true,
+          status: 'Accepted' as const,
+          message: 'Command executed successfully',
+          data: null,
+        },
+      ]
+    );
   }
 
   private generateMessageId(): string {
@@ -152,20 +216,11 @@ export class OCPPService {
    */
   async getChargerStatus(chargerId: string): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}/chargers/${chargerId}`, {
-        method: 'GET',
-        headers: this.getHeaders()
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.data || data;
+      const data = await apiClient.get(`/chargers/${chargerId}`);
+      return (data as any).data || data;
     } catch (error) {
       console.error('Get charger status error:', error);
-      
+
       // Fallback mock data
       await new Promise(resolve => setTimeout(resolve, 500));
       return {
@@ -176,12 +231,12 @@ export class OCPPService {
             connectorId: 1,
             status: 'available',
             currentPower: 0,
-            maxPower: 150
-          }
+            maxPower: 150,
+          },
         ],
         lastHeartbeat: new Date(),
         firmwareVersion: '2.1.5',
-        model: 'DC-Fast-150'
+        model: 'DC-Fast-150',
       };
     }
   }
@@ -191,20 +246,11 @@ export class OCPPService {
    */
   async getAvailableChargers(): Promise<any[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/chargers`, {
-        method: 'GET',
-        headers: this.getHeaders()
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.data || data;
+      const data = await apiClient.get('/chargers');
+      return (data as any).data || data;
     } catch (error) {
       console.error('Get chargers error:', error);
-      
+
       // Fallback mock data
       await new Promise(resolve => setTimeout(resolve, 300));
       return [

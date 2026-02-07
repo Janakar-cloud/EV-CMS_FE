@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { LoginCredentials, LoginMethod, AuthFormType } from '@/types/auth';
 import { authService } from '@/lib/auth-service';
-import { 
-  EyeIcon, 
-  EyeSlashIcon, 
-  EnvelopeIcon, 
-  PhoneIcon, 
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  EnvelopeIcon,
+  PhoneIcon,
   UserIcon,
   KeyIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 
 interface LoginFormProps {
@@ -23,7 +23,7 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
     identifier: '',
     password: '',
     loginMethod: 'username',
-    rememberMe: false
+    rememberMe: false,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -42,11 +42,11 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
   const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const detectedMethod = detectLoginMethod(value);
-    
+
     setFormData(prev => ({
       ...prev,
       identifier: value,
-      loginMethod: detectedMethod
+      loginMethod: detectedMethod,
     }));
 
     if (errors.identifier) {
@@ -63,10 +63,10 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.identifier || !formData.password) {
       setErrors({
-        general: 'Please provide both login identifier and password'
+        general: 'Please provide both login identifier and password',
       });
       return;
     }
@@ -76,7 +76,7 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
 
     try {
       const response = await authService.login(formData);
-      
+
       if (response.success && response.user && response.token) {
         onSuccess?.(response.token, response.user);
       } else {
@@ -130,22 +130,20 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-8">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 bg-blue-100 rounded-full">
+    <div className="mx-auto w-full max-w-md">
+      <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-lg">
+        <div className="mb-8 text-center">
+          <div className="mb-4 flex justify-center">
+            <div className="rounded-full bg-blue-100 p-3">
               <KeyIcon className="h-8 w-8 text-blue-600" />
             </div>
           </div>
           <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
-          <p className="text-gray-600 mt-2">
-            Welcome back to EV CMS Portal
-          </p>
+          <p className="mt-2 text-gray-600">Welcome back to EV CMS Portal</p>
         </div>
 
         {errors.general && (
-          <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-md">
+          <div className="mb-6 rounded-md border border-red-200 bg-red-50 p-3">
             <p className="text-sm text-red-700">{errors.general}</p>
           </div>
         )}
@@ -153,43 +151,54 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Login Identifier Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="login-identifier"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               Username, Email, or Phone Number
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 {getIdentifierIcon()}
               </div>
               <input
+                id="login-identifier"
                 type="text"
                 value={formData.identifier}
                 onChange={handleIdentifierChange}
-                className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`block w-full rounded-md border py-2 pl-10 pr-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.identifier ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder={getIdentifierPlaceholder()}
                 disabled={isLoading}
               />
             </div>
-            {errors.identifier && (
-              <p className="mt-1 text-sm text-red-600">{errors.identifier}</p>
-            )}
+            {errors.identifier && <p className="mt-1 text-sm text-red-600">{errors.identifier}</p>}
             <p className="mt-1 text-xs text-gray-500">
-              Detected: {formData.loginMethod === 'email' ? 'Email' : formData.loginMethod === 'phone' ? 'Phone' : 'Username'}
+              Detected:{' '}
+              {formData.loginMethod === 'email'
+                ? 'Email'
+                : formData.loginMethod === 'phone'
+                  ? 'Phone'
+                  : 'Username'}
             </p>
           </div>
 
           {/* Password Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="login-password"
+              className="mb-2 block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <div className="relative">
               <input
+                id="login-password"
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={handlePasswordChange}
-                className={`block w-full pr-10 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`block w-full rounded-md border px-3 py-2 pr-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.password ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Enter your password"
@@ -197,7 +206,7 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className="absolute inset-y-0 right-0 flex items-center pr-3"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -207,9 +216,7 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
                 )}
               </button>
             </div>
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-            )}
+            {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
           </div>
 
           {/* Remember Me */}
@@ -218,8 +225,8 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
               <input
                 type="checkbox"
                 checked={formData.rememberMe}
-                onChange={(e) => setFormData(prev => ({ ...prev, rememberMe: e.target.checked }))}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                onChange={e => setFormData(prev => ({ ...prev, rememberMe: e.target.checked }))}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 disabled={isLoading}
               />
               <span className="ml-2 text-sm text-gray-600">Remember me</span>
@@ -228,7 +235,7 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
             <button
               type="button"
               onClick={handleForgotPassword}
-              className="text-sm text-blue-600 hover:text-blue-500 focus:outline-none focus:underline"
+              className="text-sm text-blue-600 hover:text-blue-500 focus:underline focus:outline-none"
               disabled={isLoading}
             >
               Forgot password?
@@ -239,15 +246,13 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              isLoading
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700'
+            className={`flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              isLoading ? 'cursor-not-allowed bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
             {isLoading ? (
               <div className="flex items-center">
-                <ArrowPathIcon className="animate-spin -ml-1 mr-2 h-4 w-4" />
+                <ArrowPathIcon className="-ml-1 mr-2 h-4 w-4 animate-spin" />
                 Signing in...
               </div>
             ) : (
@@ -263,7 +268,7 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or</span>
+              <span className="bg-white px-2 text-gray-500">Or</span>
             </div>
           </div>
 
@@ -271,22 +276,28 @@ export default function LoginForm({ onSuccess, onSwitchForm }: LoginFormProps) {
             <button
               type="button"
               onClick={handleOTPLogin}
-              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={isLoading}
             >
-              <EnvelopeIcon className="h-4 w-4 mr-2" />
+              <EnvelopeIcon className="mr-2 h-4 w-4" />
               Sign in with OTP
             </button>
           </div>
         </div>
 
         {/* Sample Credentials */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-md">
-          <p className="text-xs font-medium text-gray-700 mb-2">Demo Credentials:</p>
-          <div className="text-xs text-gray-600 space-y-1">
-            <div><span className="font-medium">Admin:</span> admin@evcms.com / password123</div>
-            <div><span className="font-medium">Franchise:</span> franchise001 / franchise123</div>
-            <div><span className="font-medium">Partner:</span> partner001 / partner123</div>
+        <div className="mt-6 rounded-md bg-gray-50 p-4">
+          <p className="mb-2 text-xs font-medium text-gray-700">Demo Credentials:</p>
+          <div className="space-y-1 text-xs text-gray-600">
+            <div>
+              <span className="font-medium">Admin:</span> admin@evcms.com / password123
+            </div>
+            <div>
+              <span className="font-medium">Franchise:</span> franchise001 / franchise123
+            </div>
+            <div>
+              <span className="font-medium">Partner:</span> partner001 / partner123
+            </div>
           </div>
         </div>
       </div>

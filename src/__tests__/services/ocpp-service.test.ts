@@ -1,10 +1,177 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+const mockApiClient = {
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  patch: vi.fn(),
+  delete: vi.fn(),
+};
+
+vi.mock('@/lib/api-client', () => ({
+  __esModule: true,
+  default: mockApiClient,
+}));
+
 import { OCPPService } from '@/lib/ocpp-service';
 
 describe('OCPP Service', () => {
   let ocppService: OCPPService;
 
   beforeEach(() => {
+    mockApiClient.get.mockReset();
+    mockApiClient.post.mockReset();
+    mockApiClient.put.mockReset();
+    mockApiClient.patch.mockReset();
+    mockApiClient.delete.mockReset();
+
+    mockApiClient.post.mockImplementation(async (url: string, body: any) => {
+      if (url.includes('/command')) {
+        const segments = url.split('/');
+        const chargerId = segments[2];
+        const command = body.command as string;
+
+        let responseData: any = {
+          success: true,
+          status: 'Accepted',
+          message: 'Command executed successfully',
+          data: {},
+        };
+
+        switch (command) {
+          case 'Start Charging': {
+            if (chargerId === 'OFFLINE-CH-001') {
+              responseData = {
+                success: false,
+                status: 'Rejected',
+                message: 'Charger is not available',
+                data: null,
+              };
+            } else {
+              responseData = {
+                success: true,
+                status: 'Accepted',
+                message: 'Charging session started successfully',
+                data: { sessionId: 'sess_test' },
+              };
+            }
+            break;
+          }
+          case 'Stop Charging': {
+            responseData = {
+              success: true,
+              status: 'Accepted',
+              message: 'Charging session stopped',
+              data: { finalEnergy: 42 },
+            };
+            break;
+          }
+          case 'Reset Charger': {
+            responseData = {
+              success: true,
+              status: 'Accepted',
+              message: 'Charger reset initiated',
+              data: { resetType: body.parameters?.type ?? 'Soft' },
+            };
+            break;
+          }
+          case 'Reboot Charger': {
+            responseData = {
+              success: true,
+              status: 'Accepted',
+              message: 'Charger reboot initiated',
+              data: { estimatedDowntime: 180 },
+            };
+            break;
+          }
+          case 'Unlock Connector': {
+            responseData = {
+              success: true,
+              status: 'Accepted',
+              message: 'Connector unlocked successfully',
+              data: { connectorId: body.connectorId ?? 1 },
+            };
+            break;
+          }
+          case 'Clear Cache': {
+            responseData = {
+              success: true,
+              status: 'Accepted',
+              message: 'Authorization cache cleared',
+              data: { clearedEntries: 10 },
+            };
+            break;
+          }
+          case 'Update Firmware': {
+            if (body.parameters?.version) {
+              responseData = {
+                success: true,
+                status: 'Accepted',
+                message: 'Firmware update initiated',
+                data: {
+                  version: body.parameters.version,
+                  estimatedTime: 600,
+                },
+              };
+            } else {
+              responseData = {
+                success: false,
+                status: 'Rejected',
+                message: 'Update not allowed during active session',
+                data: null,
+              };
+            }
+            break;
+          }
+          default: {
+            responseData = {
+              success: true,
+              status: 'Accepted',
+              message: 'Command executed successfully',
+              data: null,
+            };
+          }
+        }
+
+        return { data: responseData };
+      }
+
+      return {};
+    });
+
+    mockApiClient.get.mockImplementation(async (url: string) => {
+      if (url.startsWith('/chargers/') && !url.endsWith('/command')) {
+        const segments = url.split('/');
+        const chargerId = segments[2];
+
+        const status = chargerId === 'OFFLINE-CH-001' ? 'Offline' : 'Available';
+
+        return {
+          data: {
+            chargerId,
+            status,
+            connectors: [
+              {
+                connectorId: 1,
+                status,
+                currentPower: 0,
+                maxPower: 150,
+              },
+            ],
+            lastHeartbeat: new Date(),
+            firmwareVersion: '2.1.5',
+            model: 'DC-Fast-150',
+          },
+        };
+      }
+
+      if (url === '/chargers') {
+        return { data: [] };
+      }
+
+      return {};
+    });
+
     ocppService = OCPPService.getInstance();
   });
 
@@ -135,7 +302,7 @@ describe('OCPP Service', () => {
     it('should handle command timeout gracefully', async () => {
       // This would require mocking timeout behavior
       vi.useFakeTimers();
-      
+
       const commandPromise = ocppService.executeCommand({
         chargerId: 'SLOW-CH-001',
         command: 'Start Charging',
@@ -164,7 +331,7 @@ describe('OCPP Service', () => {
 
       expect(status.connectors).toBeInstanceOf(Array);
       expect(status.connectors.length).toBeGreaterThan(0);
-      
+
       const connector = status.connectors[0];
       expect(connector.connectorId).toBeDefined();
       expect(connector.status).toBeDefined();
@@ -214,7 +381,7 @@ describe('OCPP Service', () => {
 
     it('should handle reconnection on disconnect', async () => {
       const reconnectSpy = vi.spyOn(ocppService as any, 'reconnect');
-      
+
       // Simulate disconnect
       global.WebSocket = vi.fn(() => ({
         addEventListener: vi.fn((event, handler) => {
@@ -332,10 +499,10 @@ describe('OCPP Service', () => {
   describe('Heartbeat Monitoring', () => {
     it('should track charger heartbeats', async () => {
       const status1 = await ocppService.getChargerStatus('TEST-CH-001');
-      
+
       // Wait a bit
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       const status2 = await ocppService.getChargerStatus('TEST-CH-001');
 
       expect(status2.lastHeartbeat).toBeInstanceOf(Date);
@@ -343,12 +510,13 @@ describe('OCPP Service', () => {
 
     it('should detect offline chargers', async () => {
       const status = await ocppService.getChargerStatus('OFFLINE-CH-001');
-      
+
       const now = Date.now();
       const heartbeatAge = now - status.lastHeartbeat.getTime();
-      
+
       // If heartbeat is old, status should be offline or faulted
-      if (heartbeatAge > 300000) { // 5 minutes
+      if (heartbeatAge > 300000) {
+        // 5 minutes
         expect(['Offline', 'Faulted']).toContain(status.status);
       }
     });
@@ -458,9 +626,21 @@ describe('OCPP Service', () => {
 
     it('should maintain message ID uniqueness in concurrent requests', async () => {
       const results = await Promise.all([
-        ocppService.executeCommand({ chargerId: 'CH-1', command: 'Start Charging', connectorId: 1 }),
-        ocppService.executeCommand({ chargerId: 'CH-2', command: 'Start Charging', connectorId: 1 }),
-        ocppService.executeCommand({ chargerId: 'CH-3', command: 'Start Charging', connectorId: 1 }),
+        ocppService.executeCommand({
+          chargerId: 'CH-1',
+          command: 'Start Charging',
+          connectorId: 1,
+        }),
+        ocppService.executeCommand({
+          chargerId: 'CH-2',
+          command: 'Start Charging',
+          connectorId: 1,
+        }),
+        ocppService.executeCommand({
+          chargerId: 'CH-3',
+          command: 'Start Charging',
+          connectorId: 1,
+        }),
       ]);
 
       const messageIds = results.map(r => r.messageId);

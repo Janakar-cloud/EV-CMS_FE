@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
-import { captureException, setUserContext, clearUserContext, addBreadcrumb } from '@/lib/error-tracking';
+import {
+  captureException,
+  setUserContext,
+  clearUserContext,
+  addBreadcrumb,
+} from '@/lib/error-tracking';
 
 // Mock Sentry
 vi.mock('@sentry/nextjs', () => ({
@@ -7,6 +12,7 @@ vi.mock('@sentry/nextjs', () => ({
   captureMessage: vi.fn(),
   setUser: vi.fn(),
   addBreadcrumb: vi.fn(),
+  setContext: vi.fn(),
   init: vi.fn(),
   Replay: vi.fn(),
 }));

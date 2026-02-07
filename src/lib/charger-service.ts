@@ -1,5 +1,4 @@
-﻿import type { AxiosError } from 'axios';
-import apiClient from './api-client';
+﻿import apiClient, { type AxiosError } from './api-client';
 import {
   Charger,
   CreateChargerRequest,
@@ -46,15 +45,21 @@ const normalizeCharger = (raw: any): Charger => {
       address: String(raw?.location?.address ?? raw?.address ?? ''),
       city: String(raw?.location?.city ?? raw?.city ?? ''),
       state: String(raw?.location?.state ?? raw?.state ?? ''),
-      zipCode: String(raw?.location?.zipCode ?? raw?.location?.postalCode ?? raw?.zipCode ?? raw?.postalCode ?? ''),
+      zipCode: String(
+        raw?.location?.zipCode ?? raw?.location?.postalCode ?? raw?.zipCode ?? raw?.postalCode ?? ''
+      ),
       country: String(raw?.location?.country ?? raw?.country ?? ''),
       latitude: raw?.location?.latitude ?? raw?.coordinates?.latitude ?? raw?.lat ?? undefined,
       longitude: raw?.location?.longitude ?? raw?.coordinates?.longitude ?? raw?.lng ?? undefined,
     },
-    installationDate: toDate(raw?.installationDate ?? raw?.installation_date ?? raw?.createdAt ?? raw?.created_at),
+    installationDate: toDate(
+      raw?.installationDate ?? raw?.installation_date ?? raw?.createdAt ?? raw?.created_at
+    ),
     lastMaintenanceDate: raw?.lastMaintenanceDate ? toDate(raw.lastMaintenanceDate) : undefined,
     nextMaintenanceDate: raw?.nextMaintenanceDate ? toDate(raw.nextMaintenanceDate) : undefined,
-    totalEnergyDelivered: Number(raw?.totalEnergyDelivered ?? raw?.total_energy_delivered ?? raw?.energyDelivered ?? 0),
+    totalEnergyDelivered: Number(
+      raw?.totalEnergyDelivered ?? raw?.total_energy_delivered ?? raw?.energyDelivered ?? 0
+    ),
     totalSessions: Number(raw?.totalSessions ?? raw?.total_sessions ?? raw?.sessions ?? 0),
     isActive: Boolean(raw?.isActive ?? raw?.active ?? true),
     createdAt: toDate(raw?.createdAt ?? raw?.created_at),
@@ -97,13 +102,19 @@ const buildValidationErrors = (error: unknown): ChargerValidationError[] => {
 
 const computeStatsFromChargers = (chargers: Charger[]): ChargerStats => {
   const totalChargers = chargers.length;
-  const statusCounts = chargers.reduce((acc, charger) => {
-    const key = charger.status as ChargerStatus;
-    acc[key] = (acc[key] ?? 0) + 1;
-    return acc;
-  }, {} as Record<ChargerStatus, number>);
+  const statusCounts = chargers.reduce(
+    (acc, charger) => {
+      const key = charger.status as ChargerStatus;
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    },
+    {} as Record<ChargerStatus, number>
+  );
 
-  const totalEnergyDelivered = chargers.reduce((sum, charger) => sum + (charger.totalEnergyDelivered ?? 0), 0);
+  const totalEnergyDelivered = chargers.reduce(
+    (sum, charger) => sum + (charger.totalEnergyDelivered ?? 0),
+    0
+  );
   const totalSessions = chargers.reduce((sum, charger) => sum + (charger.totalSessions ?? 0), 0);
 
   return {
@@ -115,7 +126,8 @@ const computeStatsFromChargers = (chargers: Charger[]): ChargerStats => {
     faultedChargers: statusCounts.faulted || 0,
     totalEnergyDelivered,
     totalSessions,
-    averageUtilization: totalChargers > 0 ? ((statusCounts.occupied || 0) / totalChargers) * 100 : 0,
+    averageUtilization:
+      totalChargers > 0 ? ((statusCounts.occupied || 0) / totalChargers) * 100 : 0,
   };
 };
 
@@ -128,7 +140,10 @@ async function tryRequest<T>(fn: () => Promise<T>): Promise<T | null> {
 }
 
 export const chargerService = {
-  createCharger: async (chargerData: CreateChargerRequest, createdBy: string): Promise<ChargerResponse> => {
+  createCharger: async (
+    chargerData: CreateChargerRequest,
+    createdBy: string
+  ): Promise<ChargerResponse> => {
     try {
       const payload = await apiClient.post('/chargers', {
         ...chargerData,
@@ -136,7 +151,8 @@ export const chargerService = {
       });
 
       const unwrapped = unwrap<any>(payload);
-      const chargerRaw = unwrapped?.charger ?? unwrapped?.data?.charger ?? unwrapped?.data ?? unwrapped;
+      const chargerRaw =
+        unwrapped?.charger ?? unwrapped?.data?.charger ?? unwrapped?.data ?? unwrapped;
       const charger = normalizeCharger(chargerRaw);
 
       return {
@@ -213,28 +229,36 @@ export const chargerService = {
   checkChargerIdAvailability: async (chargerId: string): Promise<{ available: boolean }> => {
     const byParam = await tryRequest(() => apiClient.get('/chargers', { params: { chargerId } }));
     const unwrapped = byParam ? unwrap<any>(byParam) : null;
-    const list = unwrapped ? (unwrapped?.chargers ?? unwrapped?.items ?? unwrapped?.data ?? unwrapped) : null;
+    const list = unwrapped
+      ? (unwrapped?.chargers ?? unwrapped?.items ?? unwrapped?.data ?? unwrapped)
+      : null;
     if (Array.isArray(list)) {
-      const taken = list.some((c) => String(c?.chargerId ?? c?.charger_id ?? '').toLowerCase() === chargerId.toLowerCase());
+      const taken = list.some(
+        c => String(c?.chargerId ?? c?.charger_id ?? '').toLowerCase() === chargerId.toLowerCase()
+      );
       return { available: !taken };
     }
 
     const all = await chargerService.getAllChargers();
-    const taken = all.chargers.some((c) => c.chargerId.toLowerCase() === chargerId.toLowerCase());
+    const taken = all.chargers.some(c => c.chargerId.toLowerCase() === chargerId.toLowerCase());
     return { available: !taken };
   },
 
   checkStationIdAvailability: async (stationId: string): Promise<{ available: boolean }> => {
     const byParam = await tryRequest(() => apiClient.get('/chargers', { params: { stationId } }));
     const unwrapped = byParam ? unwrap<any>(byParam) : null;
-    const list = unwrapped ? (unwrapped?.chargers ?? unwrapped?.items ?? unwrapped?.data ?? unwrapped) : null;
+    const list = unwrapped
+      ? (unwrapped?.chargers ?? unwrapped?.items ?? unwrapped?.data ?? unwrapped)
+      : null;
     if (Array.isArray(list)) {
-      const taken = list.some((c) => String(c?.stationId ?? c?.station_id ?? '').toLowerCase() === stationId.toLowerCase());
+      const taken = list.some(
+        c => String(c?.stationId ?? c?.station_id ?? '').toLowerCase() === stationId.toLowerCase()
+      );
       return { available: !taken };
     }
 
     const all = await chargerService.getAllChargers();
-    const taken = all.chargers.some((c) => c.stationId.toLowerCase() === stationId.toLowerCase());
+    const taken = all.chargers.some(c => c.stationId.toLowerCase() === stationId.toLowerCase());
     return { available: !taken };
   },
 
@@ -264,8 +288,12 @@ export const chargerService = {
 
   updateChargerStatus: async (id: string, status: ChargerStatus): Promise<ChargerResponse> => {
     const attempt1 = await tryRequest(() => apiClient.patch(`/chargers/${id}/status`, { status }));
-    const attempt2 = attempt1 ? attempt1 : await tryRequest(() => apiClient.put(`/chargers/${id}/status`, { status }));
-    const attempt3 = attempt2 ? attempt2 : await tryRequest(() => apiClient.patch(`/chargers/${id}`, { status }));
+    const attempt2 = attempt1
+      ? attempt1
+      : await tryRequest(() => apiClient.put(`/chargers/${id}/status`, { status }));
+    const attempt3 = attempt2
+      ? attempt2
+      : await tryRequest(() => apiClient.patch(`/chargers/${id}`, { status }));
 
     if (!attempt3) {
       return {
@@ -284,11 +312,15 @@ export const chargerService = {
     };
   },
 
-  updateCharger: async (id: string, chargerData: Partial<CreateChargerRequest>): Promise<ChargerResponse> => {
+  updateCharger: async (
+    id: string,
+    chargerData: Partial<CreateChargerRequest>
+  ): Promise<ChargerResponse> => {
     try {
       const payload = await apiClient.put(`/chargers/${id}`, chargerData);
       const unwrapped = unwrap<any>(payload);
-      const chargerRaw = unwrapped?.charger ?? unwrapped?.data?.charger ?? unwrapped?.data ?? unwrapped;
+      const chargerRaw =
+        unwrapped?.charger ?? unwrapped?.data?.charger ?? unwrapped?.data ?? unwrapped;
 
       return {
         success: true,

@@ -9,24 +9,12 @@ import { Separator } from '@/components/ui/separator';
 import { Loader2, Shield, Mail, Phone, Clock3, CheckCircle2, Ban } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-
-interface AdminUserDetail {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  role: 'user' | 'brand' | 'admin';
-  status: 'active' | 'suspended';
-  kycStatus?: 'pending' | 'verified' | 'rejected';
-  createdAt: string;
-  lastLogin?: string;
-  segments?: string[];
-}
+import adminUsersService, { type AdminUserSummary } from '@/lib/admin-users-service';
 
 export default function AdminUserDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const [user, setUser] = useState<AdminUserDetail | null>(null);
+  const [user, setUser] = useState<AdminUserSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
@@ -37,9 +25,7 @@ export default function AdminUserDetailPage() {
   const loadUser = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/v1/admin/users/${params?.id}`);
-      if (!response.ok) throw new Error('User not found');
-      const data = await response.json();
+      const data = await adminUsersService.getUser(params?.id as string);
       setUser(data);
     } catch (error: any) {
       toast.error(error.message || 'Failed to load user');
@@ -53,12 +39,7 @@ export default function AdminUserDetailPage() {
     try {
       setUpdating(true);
       const nextStatus = user.status === 'active' ? 'suspended' : 'active';
-      const response = await fetch(`/api/v1/admin/users/${user.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: nextStatus }),
-      });
-      if (!response.ok) throw new Error('Failed to update user status');
+      await adminUsersService.updateUserStatus(user.id, nextStatus);
       setUser({ ...user, status: nextStatus });
       toast.success(`User ${nextStatus === 'active' ? 'activated' : 'suspended'}`);
     } catch (error: any) {
@@ -89,7 +70,7 @@ export default function AdminUserDetailPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-4">
+    <div className="container mx-auto space-y-4 p-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">{user.name}</h1>
@@ -105,7 +86,11 @@ export default function AdminUserDetailPage() {
             disabled={updating}
           >
             {updating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {user.status === 'active' ? <Ban className="mr-2 h-4 w-4" /> : <CheckCircle2 className="mr-2 h-4 w-4" />} 
+            {user.status === 'active' ? (
+              <Ban className="mr-2 h-4 w-4" />
+            ) : (
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+            )}
             {user.status === 'active' ? 'Suspend' : 'Activate'}
           </Button>
         </div>
@@ -118,7 +103,9 @@ export default function AdminUserDetailPage() {
             <CardTitle>Account Status</CardTitle>
           </div>
           <div className="flex gap-2">
-            <Badge variant={user.status === 'active' ? 'default' : 'destructive'}>{user.status}</Badge>
+            <Badge variant={user.status === 'active' ? 'default' : 'destructive'}>
+              {user.status}
+            </Badge>
             {user.kycStatus ? (
               <Badge variant={user.kycStatus === 'verified' ? 'default' : 'secondary'}>
                 KYC: {user.kycStatus}
@@ -154,16 +141,21 @@ export default function AdminUserDetailPage() {
             <div className="space-y-2 text-sm text-muted-foreground">
               <p className="font-semibold text-foreground">Segments</p>
               <div className="flex flex-wrap gap-2">
-                {(user.segments || ['General']).map((segment) => (
-                  <Badge key={segment} variant="outline">{segment}</Badge>
+                {(user.segments || ['General']).map((segment: string) => (
+                  <Badge key={segment} variant="outline">
+                    {segment}
+                  </Badge>
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground">Use segments to power targeted notifications and offers.</p>
+              <p className="text-xs text-muted-foreground">
+                Use segments to power targeted notifications and offers.
+              </p>
             </div>
           </div>
           <Separator />
           <div className="text-sm text-muted-foreground">
-            For actions like password reset or role changes, wire this screen to your admin API endpoints.
+            For actions like password reset or role changes, wire this screen to your admin API
+            endpoints.
           </div>
         </CardContent>
       </Card>

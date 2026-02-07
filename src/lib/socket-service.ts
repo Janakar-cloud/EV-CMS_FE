@@ -1,5 +1,14 @@
 import io, { Socket } from 'socket.io-client';
 
+// LEGACY SOCKET SERVICE
+// ---------------------
+// This module predates the centralized SocketProvider in src/contexts/socket.tsx.
+// New code MUST use SocketProvider + useSocket (and hooks built on top of it)
+// instead of creating independent Socket.IO connections via this service.
+
+const SOCKET_URL =
+  process.env.NEXT_PUBLIC_SOCKET_URL || process.env.SOCKET_URL || 'http://localhost:5000';
+
 export interface ChargerStatusData {
   chargerId: string;
   status: 'available' | 'in-use' | 'faulted' | 'unavailable';
@@ -86,9 +95,7 @@ class SocketService {
   /**
    * Initialize Socket.IO connection
    */
-  connect(
-    socketUrl: string = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000'
-  ): Promise<void> {
+  connect(socketUrl: string = SOCKET_URL): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.socket?.connected) {
         resolve();
@@ -126,7 +133,7 @@ class SocketService {
         });
 
         // Connection error
-        this.socket.on('connect_error', (error) => {
+        this.socket.on('connect_error', error => {
           console.error('[Socket.IO] Connection error:', error);
           this.isConnecting = false;
           if (this.reconnectAttempts === 0) {
@@ -135,7 +142,7 @@ class SocketService {
         });
 
         // Disconnection
-        this.socket.on('disconnect', (reason) => {
+        this.socket.on('disconnect', reason => {
           console.log('[Socket.IO] Disconnected:', reason);
           this.isConnecting = false;
         });
@@ -260,9 +267,7 @@ class SocketService {
   /**
    * Subscribe to system messages
    */
-  onSystemMessage(
-    handler: SocketEventHandler<{ message: string; type: string }>
-  ): () => void {
+  onSystemMessage(handler: SocketEventHandler<{ message: string; type: string }>): () => void {
     return this.on('systemMessage', handler);
   }
 
@@ -291,7 +296,7 @@ class SocketService {
   private emitToListeners<T>(event: string, data: T): void {
     const handlers = this.listeners.get(event);
     if (handlers) {
-      handlers.forEach((handler) => {
+      handlers.forEach(handler => {
         try {
           handler(data);
         } catch (error) {

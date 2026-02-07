@@ -1,7 +1,13 @@
 ﻿'use client';
 
+import Link from 'next/link';
 import { Fragment } from 'react';
-import { BellIcon, Cog6ToothIcon, UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import {
+  BellIcon,
+  Cog6ToothIcon,
+  UserCircleIcon,
+  ArrowRightOnRectangleIcon,
+} from '@heroicons/react/24/outline';
 import { Menu, Transition } from '@headlessui/react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -34,12 +40,24 @@ export default function Header() {
       <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
         <div className="relative flex flex-1 items-center">
           <h1 className="text-2xl font-semibold text-white">VoltGrid Admin</h1>
+          {/* Navigation links */}
+          <nav className="ml-10 flex items-center space-x-8">
+            <Link
+              href="/"
+              className="font-medium text-slate-200 transition-colors hover:text-emerald-400"
+            >
+              Home
+            </Link>
+            <Link
+              href="/about"
+              className="font-medium text-slate-200 transition-colors hover:text-emerald-400"
+            >
+              About
+            </Link>
+          </nav>
         </div>
         <div className="flex items-center gap-x-4 lg:gap-x-6">
-          <button
-            type="button"
-            className="-m-2.5 p-2.5 text-slate-300 hover:text-white"
-          >
+          <button type="button" className="-m-2.5 p-2.5 text-slate-300 hover:text-white">
             <span className="sr-only">View notifications</span>
             <BellIcon className="h-6 w-6" aria-hidden="true" />
           </button>
@@ -51,7 +69,10 @@ export default function Header() {
               <span className="sr-only">Open user menu</span>
               <UserCircleIcon className="h-8 w-8 text-slate-300" aria-hidden="true" />
               <span className="hidden lg:flex lg:items-center">
-                <span className="ml-4 text-sm font-semibold leading-6 text-white" aria-hidden="true">
+                <span
+                  className="ml-4 text-sm font-semibold leading-6 text-white"
+                  aria-hidden="true"
+                >
                   {user?.fullName || 'User'}
                 </span>
                 <span className="ml-2 text-xs text-slate-400" aria-hidden="true">
@@ -69,24 +90,24 @@ export default function Header() {
               leaveTo="transform opacity-0 scale-95"
             >
               <Menu.Items className="absolute right-0 z-10 mt-2.5 w-48 origin-top-right rounded-md bg-slate-900/80 px-2 py-2 shadow-2xl shadow-slate-950/60 ring-1 ring-white/10 backdrop-blur">
-                <div className="px-3 py-2 border-b border-slate-800">
+                <div className="border-b border-slate-800 px-3 py-2">
                   <p className="text-sm font-medium text-white">{user?.fullName}</p>
                   <p className="text-xs text-slate-400">{user?.email}</p>
                   <p className="text-xs text-emerald-400">{getRoleDisplayName(user?.role || '')}</p>
                 </div>
-                
+
                 <Menu.Item>
                   {({ active }) => (
-                    <a
+                    <Link
                       href="/settings"
                       className={classNames(
                         active ? 'bg-slate-800/60' : '',
-                        'block px-3 py-2 text-sm leading-6 text-slate-100 rounded'
+                        'block rounded px-3 py-2 text-sm leading-6 text-slate-100'
                       )}
                     >
-                      <Cog6ToothIcon className="h-4 w-4 inline mr-2" />
+                      <Cog6ToothIcon className="mr-2 inline h-4 w-4" />
                       Settings
-                    </a>
+                    </Link>
                   )}
                 </Menu.Item>
 
@@ -96,10 +117,10 @@ export default function Header() {
                       onClick={handleLogout}
                       className={classNames(
                         active ? 'bg-slate-800/60' : '',
-                        'w-full text-left block px-3 py-2 text-sm leading-6 text-slate-100 rounded'
+                        'block w-full rounded px-3 py-2 text-left text-sm leading-6 text-slate-100'
                       )}
                     >
-                      <ArrowRightOnRectangleIcon className="h-4 w-4 inline mr-2" />
+                      <ArrowRightOnRectangleIcon className="mr-2 inline h-4 w-4" />
                       Sign out
                     </button>
                   )}

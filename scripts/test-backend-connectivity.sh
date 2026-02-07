@@ -15,9 +15,9 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-API_URL="${NEXT_PUBLIC_API_URL:-https://api.ev-cms.com/api/v1}"
-OCPP_URL="${NEXT_PUBLIC_OCPP_API_URL:-https://ocpp.ev-cms.com}"
-WS_URL="${NEXT_PUBLIC_WS_URL:-wss://api.ev-cms.com}"
+API_URL="${API_URL:-https://api.ev-cms.com/api/v1}"
+OCPP_URL="${OCPP_API_URL:-https://ocpp.ev-cms.com}"
+WS_URL="${WS_URL:-wss://api.ev-cms.com}"
 
 # Test counter
 TESTS_PASSED=0

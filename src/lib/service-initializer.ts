@@ -49,8 +49,7 @@ class ServiceInitializer {
   async checkBackendHealth(): Promise<ServiceStatus> {
     const start = Date.now();
     try {
-      const response = await fetch('http://localhost:5000/health');
-      const data = await response.json();
+      const data = await apiClient.get('/health');
       const responseTime = Date.now() - start;
 
       if (data.success && data.mongodb === 'connected') {

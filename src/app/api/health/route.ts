@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       environment: process.env.NODE_ENV || 'development',
-      version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
+      version: process.env.APP_VERSION || '1.0.0',
       responseTime: Date.now() - startTime,
     };
 

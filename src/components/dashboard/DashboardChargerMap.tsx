@@ -138,7 +138,7 @@ export function DashboardChargerMap() {
     loadChargers();
 
     // Check if API key is available
-    if (process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
+    if (process.env.GOOGLE_MAPS_API_KEY) {
       setApiKeyReady(true);
     } else {
       console.warn('Google Maps API key not configured. Using demo chargers.');
@@ -249,7 +249,7 @@ export function DashboardChargerMap() {
           No chargers available
         </div>
       ) : (
-        <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
+        <LoadScript googleMapsApiKey={process.env.GOOGLE_MAPS_API_KEY || ''}>
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
             center={mapCenter}

@@ -5,6 +5,8 @@ import { captureException, addBreadcrumb } from './error-tracking';
 
 class ApiClient {
   private instance: AxiosInstance;
+  private isRefreshing = false;
+  private refreshPromise: Promise<string | null> | null = null;
 
   constructor() {
     this.instance = axios.create({
@@ -21,7 +23,7 @@ class ApiClient {
   private setupInterceptors() {
     // Request interceptor
     this.instance.interceptors.request.use(
-      (config) => {
+      config => {
         // Get token from localStorage
         if (typeof window !== 'undefined') {
           const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
@@ -33,7 +35,7 @@ class ApiClient {
         addBreadcrumb(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
         return config;
       },
-      (error) => {
+      error => {
         return Promise.reject(error);
       }
     );
@@ -43,11 +45,102 @@ class ApiClient {
       (response: AxiosResponse) => {
         return response;
       },
-      (error: AxiosError) => {
+      (error: AxiosError) => this.handleResponseError(error)
+    );
+  }
+
+  private async handleResponseError(error: AxiosError) {
+    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+
+    // If we got a 401, try a single refresh-then-retry flow
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // Do not try to refresh if the failing request is the refresh endpoint itself
+      const url = originalRequest.url || '';
+      if (url.includes('/auth/refresh-token')) {
         this.handleError(error);
         return Promise.reject(error);
       }
-    );
+
+      originalRequest._retry = true;
+
+      try {
+        const newToken = await this.getOrRefreshToken();
+
+        if (newToken) {
+          // Update auth header and retry original request once
+          originalRequest.headers = originalRequest.headers || {};
+          (originalRequest.headers as any).Authorization = `Bearer ${newToken}`;
+          return this.instance(originalRequest);
+        }
+      } catch (refreshError) {
+        // Fall through to standard 401 handling below
+        console.error('Token refresh failed:', refreshError);
+      }
+    }
+
+    this.handleError(error);
+    return Promise.reject(error);
+  }
+
+  private async getOrRefreshToken(): Promise<string | null> {
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.isRefreshing = true;
+    this.refreshPromise = this.refreshAccessToken();
+
+    try {
+      return await this.refreshPromise;
+    } finally {
+      this.isRefreshing = false;
+      this.refreshPromise = null;
+    }
+  }
+
+  private async refreshAccessToken(): Promise<string | null> {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      return null;
+    }
+
+    try {
+      // Use a bare axios call to avoid interceptor recursion
+      const response = await axios.post(
+        `${API_CONFIG.BASE_URL}/auth/refresh-token`,
+        { refreshToken },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const data: any = response.data;
+      const newToken: string | undefined =
+        data?.token ?? data?.data?.accessToken ?? data?.data?.token;
+      const newRefreshToken: string | undefined = data?.refreshToken ?? data?.data?.refreshToken;
+
+      if (newToken) {
+        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, newToken);
+        if (newRefreshToken) {
+          localStorage.setItem('refreshToken', newRefreshToken);
+        }
+        return newToken;
+      }
+
+      return null;
+    } catch (error) {
+      // On refresh failure, clear auth and let caller handle redirect
+      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
+      localStorage.removeItem('refreshToken');
+      return null;
+    }
   }
 
   private handleError(error: AxiosError) {
@@ -87,7 +180,12 @@ class ApiClient {
         if (typeof window !== 'undefined') {
           localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
           localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
-          window.location.href = '/login';
+          try {
+            window.location.href = '/login';
+          } catch {
+            // In test environments (jsdom), full navigation may not be implemented.
+            // Swallow navigation errors while still clearing auth state.
+          }
         }
         break;
 
@@ -163,3 +261,8 @@ class ApiClient {
 
 export const apiClient = new ApiClient();
 export default apiClient;
+
+// Re-export AxiosError type so other modules can use it without
+// importing axios directly. This supports the "single API client"
+// rule while preserving error typing where needed.
+export type { AxiosError };

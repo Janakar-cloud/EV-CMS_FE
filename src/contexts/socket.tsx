@@ -35,7 +35,8 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
+    const socketUrl =
+      process.env.NEXT_PUBLIC_SOCKET_URL || process.env.SOCKET_URL || 'http://localhost:5000';
 
     const newSocket = io(socketUrl, {
       auth: {
@@ -56,13 +57,13 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Connection error
-    newSocket.on('connect_error', (err) => {
+    newSocket.on('connect_error', err => {
       console.error('[Socket] Connection error:', err.message);
       setError(err.message);
     });
 
     // Disconnection
-    newSocket.on('disconnect', (reason) => {
+    newSocket.on('disconnect', reason => {
       console.log('[Socket] Disconnected:', reason);
       setIsConnected(false);
     });
@@ -75,15 +76,18 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Subscribe to event
-  const subscribe = useCallback((event: string, handler: (...args: any[]) => void) => {
-    if (!socket) return () => {};
+  const subscribe = useCallback(
+    (event: string, handler: (...args: any[]) => void) => {
+      if (!socket) return () => {};
 
-    socket.on(event, handler);
+      socket.on(event, handler);
 
-    return () => {
-      socket.off(event, handler);
-    };
-  }, [socket]);
+      return () => {
+        socket.off(event, handler);
+      };
+    },
+    [socket]
+  );
 
   // Emit event
   const emit = useCallback(

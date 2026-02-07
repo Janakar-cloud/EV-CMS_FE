@@ -7,9 +7,9 @@ Write-Host "================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Configuration
-$API_URL = $env:NEXT_PUBLIC_API_URL -or "https://api.ev-cms.com/api/v1"
-$OCPP_URL = $env:NEXT_PUBLIC_OCPP_API_URL -or "https://ocpp.ev-cms.com"
-$WS_URL = $env:NEXT_PUBLIC_WS_URL -or "wss://api.ev-cms.com"
+$API_URL = $env:API_URL -or "https://api.ev-cms.com/api/v1"
+$OCPP_URL = $env:OCPP_API_URL -or "https://ocpp.ev-cms.com"
+$WS_URL = $env:WS_URL -or "wss://api.ev-cms.com"
 
 # Test counter
 $TestsPassed = 0
