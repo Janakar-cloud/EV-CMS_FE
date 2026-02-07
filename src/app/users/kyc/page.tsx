@@ -110,23 +110,23 @@ export default function KYCVerificationPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-100">KYC Verification</h1>
-          <div className="text-sm text-slate-400">
-            Total: {total} users
-          </div>
+          <div className="text-sm text-slate-400">Total: {total} users</div>
         </div>
 
         {error && (
-          <div className="p-4 bg-red-950/50 border border-red-800 text-red-400 rounded-lg">
+          <div className="rounded-lg border border-red-800 bg-red-950/50 p-4 text-red-400">
             {error}
           </div>
         )}
 
         {/* Filters */}
-        <div className="flex gap-4 items-center">
+        <div className="flex items-center gap-4">
           <select
             value={filters.status || ''}
-            onChange={(e) => setFilters({ ...filters, status: e.target.value as KYCFilters['status'], page: 1 })}
-            className="px-4 py-2 border border-slate-700 rounded-lg bg-slate-900/50 text-slate-100"
+            onChange={e =>
+              setFilters({ ...filters, status: e.target.value as KYCFilters['status'], page: 1 })
+            }
+            className="rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-2 text-slate-100"
           >
             <option value="">All Status</option>
             <option value="pending">Pending</option>
@@ -137,27 +137,27 @@ export default function KYCVerificationPage() {
         </div>
 
         {/* Users Table */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
+        <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-800/50">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-700">
               <thead className="bg-slate-900/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
                     Documents
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
                     Submitted
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
                     Actions
                   </th>
                 </tr>
@@ -176,12 +176,12 @@ export default function KYCVerificationPage() {
                     </td>
                   </tr>
                 ) : (
-                  users.map((user) => (
+                  users.map(user => (
                     <tr key={user._id || user.userId}>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="whitespace-nowrap px-6 py-4">
                         <div className="flex items-center">
-                          <div className="h-10 w-10 flex-shrink-0 bg-blue-100 rounded-full flex items-center justify-center">
-                            <span className="text-blue-600 font-medium">
+                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-100">
+                            <span className="font-medium text-blue-600">
                               {(user.firstName?.[0] || 'U').toUpperCase()}
                             </span>
                           </div>
@@ -189,30 +189,30 @@ export default function KYCVerificationPage() {
                             <div className="text-sm font-medium text-slate-100">
                               {user.firstName} {user.lastName}
                             </div>
-                            <div className="text-sm text-slate-400">
-                              {user.phone || '-'}
-                            </div>
+                            <div className="text-sm text-slate-400">{user.phone || '-'}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-200">
+                      <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-200">
                         {user.email}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-200">
+                      <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-200">
                         {user.documents?.length || 0} document(s)
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(user.kycStatus)}`}>
+                      <td className="whitespace-nowrap px-6 py-4">
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${getStatusBadge(user.kycStatus)}`}
+                        >
                           {user.kycStatus?.replace('_', ' ').toUpperCase()}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-100">
+                      <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-100">
                         {formatDate(user.submittedAt)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
                         <button
                           onClick={() => viewUserDetails(user)}
-                          className="text-blue-600 hover:text-blue-500 mr-4"
+                          className="mr-4 text-blue-600 hover:text-blue-500"
                         >
                           View
                         </button>
@@ -220,7 +220,7 @@ export default function KYCVerificationPage() {
                           <>
                             <button
                               onClick={() => handleApprove(user.userId || user._id)}
-                              className="text-green-600 hover:text-green-500 mr-4"
+                              className="mr-4 text-green-600 hover:text-green-500"
                             >
                               Approve
                             </button>
@@ -236,7 +236,7 @@ export default function KYCVerificationPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-slate-700 flex items-center justify-between">
+            <div className="flex items-center justify-between border-t border-slate-700 px-6 py-4">
               <div className="text-sm text-slate-400">
                 Page {filters.page} of {totalPages}
               </div>
@@ -244,14 +244,14 @@ export default function KYCVerificationPage() {
                 <button
                   disabled={filters.page === 1}
                   onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
-                  className="px-3 py-1 border rounded disabled:opacity-50"
+                  className="rounded border px-3 py-1 disabled:opacity-50"
                 >
                   Previous
                 </button>
                 <button
                   disabled={filters.page === totalPages}
                   onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
-                  className="px-3 py-1 border rounded disabled:opacity-50"
+                  className="rounded border px-3 py-1 disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -262,25 +262,28 @@ export default function KYCVerificationPage() {
 
         {/* User Detail Modal */}
         {showModal && selectedUser && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-6">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-slate-700 bg-slate-900/50 p-6">
+              <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-bold">KYC Details</h2>
                 <button
-                  onClick={() => { setShowModal(false); setSelectedUser(null); }}
+                  onClick={() => {
+                    setShowModal(false);
+                    setSelectedUser(null);
+                  }}
                   className="text-slate-400 hover:text-slate-200"
                 >
-                  ✕
+                  Close
                 </button>
               </div>
 
               {/* User Info */}
               <div className="mb-6">
-                <h3 className="font-semibold mb-2">User Information</h3>
+                <h3 className="mb-2 font-semibold">User Information</h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-slate-400">Name:</span>{' '}
-                    {selectedUser.firstName} {selectedUser.lastName}
+                    <span className="text-slate-400">Name:</span> {selectedUser.firstName}{' '}
+                    {selectedUser.lastName}
                   </div>
                   <div>
                     <span className="text-slate-400">Email:</span> {selectedUser.email}
@@ -289,8 +292,10 @@ export default function KYCVerificationPage() {
                     <span className="text-slate-400">Phone:</span> {selectedUser.phone || '-'}
                   </div>
                   <div>
-                    <span className="text-slate-400">Status:</span>{' '}'
-                    <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadge(selectedUser.kycStatus)}`}>
+                    <span className="text-slate-400">Status:</span> '
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs ${getStatusBadge(selectedUser.kycStatus)}`}
+                    >
                       {selectedUser.kycStatus?.replace('_', ' ').toUpperCase()}
                     </span>
                   </div>
@@ -299,24 +304,24 @@ export default function KYCVerificationPage() {
 
               {/* Documents */}
               <div className="mb-6">
-                <h3 className="font-semibold mb-2">Documents</h3>
+                <h3 className="mb-2 font-semibold">Documents</h3>
                 {selectedUser.documents?.length > 0 ? (
                   <div className="space-y-3">
                     {selectedUser.documents.map((doc: KYCDocument, idx: number) => (
-                      <div key={idx} className="p-3 border rounded-lg">
-                        <div className="flex justify-between items-center">
+                      <div key={idx} className="rounded-lg border p-3">
+                        <div className="flex items-center justify-between">
                           <div>
                             <span className="font-medium">{getDocumentTypeName(doc.type)}</span>
-                              <p className="text-sm text-slate-400">
-                              Number: {doc.documentNumber}
-                            </p>
+                            <p className="text-sm text-slate-400">Number: {doc.documentNumber}</p>
                           </div>
-                          <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadge(doc.status)}`}>
+                          <span
+                            className={`rounded-full px-2 py-1 text-xs ${getStatusBadge(doc.status)}`}
+                          >
                             {doc.status?.toUpperCase()}
                           </span>
                         </div>
                         {doc.rejectionReason && (
-                          <p className="text-sm text-red-600 mt-2">
+                          <p className="mt-2 text-sm text-red-600">
                             Rejection Reason: {doc.rejectionReason}
                           </p>
                         )}
@@ -331,12 +336,12 @@ export default function KYCVerificationPage() {
               {/* Rejection Reason Input (for pending) */}
               {selectedUser.kycStatus === 'pending' && (
                 <div className="mb-6">
-                  <h3 className="font-semibold mb-2">Reject with Reason</h3>
+                  <h3 className="mb-2 font-semibold">Reject with Reason</h3>
                   <textarea
                     value={rejectionReason}
-                    onChange={(e) => setRejectionReason(e.target.value)}
+                    onChange={e => setRejectionReason(e.target.value)}
                     placeholder="Enter reason for rejection..."
-                    className="w-full px-3 py-2 border rounded-lg"
+                    className="w-full rounded-lg border px-3 py-2"
                     rows={3}
                   />
                 </div>
@@ -344,17 +349,20 @@ export default function KYCVerificationPage() {
 
               {/* Previous Rejection Reason */}
               {selectedUser.rejectionReason && (
-                <div className="mb-6 p-3 bg-red-50 rounded-lg">
-                  <h3 className="font-semibold text-red-700 mb-1">Previous Rejection Reason</h3>
+                <div className="mb-6 rounded-lg bg-red-50 p-3">
+                  <h3 className="mb-1 font-semibold text-red-700">Previous Rejection Reason</h3>
                   <p className="text-sm text-red-600">{selectedUser.rejectionReason}</p>
                 </div>
               )}
 
               {/* Actions */}
-              <div className="flex gap-4 justify-end">
+              <div className="flex justify-end gap-4">
                 <button
-                  onClick={() => { setShowModal(false); setSelectedUser(null); }}
-                  className="px-4 py-2 border rounded-lg"
+                  onClick={() => {
+                    setShowModal(false);
+                    setSelectedUser(null);
+                  }}
+                  className="rounded-lg border px-4 py-2"
                 >
                   Close
                 </button>
@@ -363,14 +371,14 @@ export default function KYCVerificationPage() {
                     <button
                       onClick={() => handleReject(selectedUser.userId || selectedUser._id)}
                       disabled={actionLoading}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                      className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:opacity-50"
                     >
                       {actionLoading ? 'Processing...' : 'Reject'}
                     </button>
                     <button
                       onClick={() => handleApprove(selectedUser.userId || selectedUser._id)}
                       disabled={actionLoading}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                      className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-50"
                     >
                       {actionLoading ? 'Processing...' : 'Approve'}
                     </button>

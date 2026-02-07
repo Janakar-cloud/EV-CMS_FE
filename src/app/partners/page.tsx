@@ -60,69 +60,83 @@ export default function PartnersPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-100">Partner Management</h1>
-          <Link 
+          <Link
             href="/partners/onboarding"
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium transition-colors"
+            className="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition-colors hover:bg-emerald-500"
           >
             + Add New Partner
           </Link>
         </div>
 
         {error && (
-          <div className="p-4 bg-red-950/50 border border-red-800 text-red-400 rounded-lg">{error}</div>
+          <div className="rounded-lg border border-red-800 bg-red-950/50 p-4 text-red-400">
+            {error}
+          </div>
         )}
 
         {/* Quick Links */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Link href="/partners/location" className="bg-slate-800/50 border border-slate-700 p-4 rounded-lg hover:border-slate-600 transition-colors">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <Link
+            href="/partners/location"
+            className="rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition-colors hover:border-slate-600"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-400">Franchise Partners</p>
                 <p className="text-2xl font-bold text-blue-400">{stats.franchise}</p>
               </div>
-              <div className="w-10 h-10 bg-blue-950/50 rounded-full flex items-center justify-center">
-                <span className="text-blue-400">🏢</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-950/50">
+                <span className="text-blue-400">FR</span>
               </div>
             </div>
           </Link>
-          <Link href="/partners/smart" className="bg-slate-800/50 border border-slate-700 p-4 rounded-lg hover:border-slate-600 transition-colors">
+          <Link
+            href="/partners/smart"
+            className="rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition-colors hover:border-slate-600"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-400">Roaming Partners</p>
                 <p className="text-2xl font-bold text-purple-400">{stats.roaming}</p>
               </div>
-              <div className="w-10 h-10 bg-purple-950/50 rounded-full flex items-center justify-center">
-                <span className="text-purple-400">🌐</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-950/50">
+                <span className="text-purple-400">RO</span>
               </div>
             </div>
           </Link>
-          <Link href="/partners/affiliate" className="bg-slate-800/50 border border-slate-700 p-4 rounded-lg hover:border-slate-600 transition-colors">
+          <Link
+            href="/partners/affiliate"
+            className="rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition-colors hover:border-slate-600"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-400">Network Operators</p>
                 <p className="text-2xl font-bold text-orange-600">{stats.networkOperator}</p>
               </div>
-              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                <span className="text-orange-600">⚡</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
+                <span className="text-orange-600">NO</span>
               </div>
             </div>
           </Link>
-          <Link href="/partners/onboarding" className="bg-slate-800/50 border border-slate-700 p-4 rounded-lg hover:border-slate-600 transition-colors">
+          <Link
+            href="/partners/onboarding"
+            className="rounded-lg border border-slate-700 bg-slate-800/50 p-4 transition-colors hover:border-slate-600"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-400">Pending Approval</p>
                 <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
               </div>
-              <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                <span className="text-yellow-600">⏳</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100">
+                <span className="text-yellow-600">PE</span>
               </div>
             </div>
           </Link>
         </div>
 
         {/* Recent Partners Table */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+        <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-800/50">
+          <div className="flex items-center justify-between border-b border-slate-700 px-6 py-4">
             <h2 className="text-lg font-semibold">All Partners</h2>
             <span className="text-sm text-slate-400">{stats.total} total</span>
           </div>
@@ -130,31 +144,47 @@ export default function PartnersPage() {
             <table className="min-w-full divide-y divide-slate-700">
               <thead className="bg-slate-900/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Partner</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Contact</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Partner
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Type
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Contact
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-slate-400">Loading partners...</td>
+                    <td colSpan={5} className="px-6 py-8 text-center text-slate-400">
+                      Loading partners...
+                    </td>
                   </tr>
                 ) : partners.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-slate-400">No partners found</td>
+                    <td colSpan={5} className="px-6 py-8 text-center text-slate-400">
+                      No partners found
+                    </td>
                   </tr>
                 ) : (
-                  partners.slice(0, 10).map((partner) => (
+                  partners.slice(0, 10).map(partner => (
                     <tr key={partner._id}>
                       <td className="px-6 py-4">
                         <div className="font-medium text-slate-100">{partner.name}</div>
                         <div className="text-sm text-slate-400">{partner.country}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 text-xs rounded-full ${getTypeColor(partner.type)}`}>
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs ${getTypeColor(partner.type)}`}
+                        >
                           {partner.type}
                         </span>
                       </td>
@@ -163,12 +193,14 @@ export default function PartnersPage() {
                         <div>{partner.phone || '-'}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(partner.status)}`}>
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs ${getStatusColor(partner.status)}`}
+                        >
                           {partner.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        <button className="text-blue-600 hover:text-blue-900 mr-3">View</button>
+                        <button className="mr-3 text-blue-600 hover:text-blue-900">View</button>
                         <button className="text-slate-400 hover:text-slate-100">Edit</button>
                       </td>
                     </tr>

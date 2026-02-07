@@ -79,14 +79,14 @@ class ServiceInitializer {
    * Test all services
    */
   async testAllServices(): Promise<SystemHealthCheck> {
-    console.log('🔍 Starting service health check...');
+    console.log('Starting service health check...');
 
     const backendStatus = await this.checkBackendHealth();
     const services: ServiceStatus[] = [];
 
     // If backend is down, skip service tests
     if (backendStatus.status === 'error') {
-      console.error('❌ Backend is down. Skipping service tests.');
+      console.error('Backend is down. Skipping service tests.');
       return {
         backend: backendStatus,
         services: [],
@@ -169,14 +169,14 @@ class ServiceInitializer {
           message: result.message,
           responseTime,
         });
-        console.log(`✅ ${serviceTest.name}: ${result.message} (${responseTime}ms)`);
+        console.log(`${serviceTest.name}: ${result.message} (${responseTime}ms)`);
       } catch (error: any) {
         services.push({
           name: serviceTest.name,
           status: 'error',
           message: error.message || 'Test failed',
         });
-        console.error(`❌ ${serviceTest.name}: ${error.message}`);
+        console.error(`${serviceTest.name}: ${error.message}`);
       }
     }
 
@@ -196,21 +196,22 @@ class ServiceInitializer {
    * Print health check results
    */
   printHealthCheck(health: SystemHealthCheck) {
-    console.log('\n📊 ===== SYSTEM HEALTH CHECK =====');
-    console.log(`⏰ Timestamp: ${health.timestamp}`);
+    console.log('\n===== SYSTEM HEALTH CHECK =====');
+    console.log(`Timestamp: ${health.timestamp}`);
     console.log(
-      `📡 Backend: ${health.backend.status === 'healthy' ? '✅' : '❌'} ${health.backend.message}`
+      `Backend: ${health.backend.status === 'healthy' ? 'OK' : 'ERROR'} ${health.backend.message}`
     );
-    console.log(`\n📦 Services (${health.services.length} tested):`);
+    console.log(`\nServices (${health.services.length} tested):`);
 
     health.services.forEach(service => {
-      const icon = service.status === 'healthy' ? '✅' : '❌';
       console.log(
-        `${icon} ${service.name}: ${service.message}${service.responseTime ? ` (${service.responseTime}ms)` : ''}`
+        `${service.status === 'healthy' ? 'OK' : 'ERROR'} ${service.name}: ${service.message}${
+          service.responseTime ? ` (${service.responseTime}ms)` : ''
+        }`
       );
     });
 
-    console.log(`\n🎯 Overall Status: ${health.overallStatus.toUpperCase()}`);
+    console.log(`\nOverall Status: ${health.overallStatus.toUpperCase()}`);
     console.log('================================\n');
   }
 
@@ -257,14 +258,14 @@ class ServiceInitializer {
    * Initialize all services (for dev/testing)
    */
   async initialize() {
-    console.log('🚀 Initializing EV CMS Services...\n');
+    console.log('Initializing EV CMS Services...\n');
 
     const health = await this.testAllServices();
     this.printHealthCheck(health);
 
     if (health.overallStatus === 'down') {
-      console.error('❌ System is DOWN. Please start the backend server.');
-      console.log('\n💡 Backend startup instructions:');
+      console.error('System is DOWN. Please start the backend server.');
+      console.log('\nBackend startup instructions:');
       console.log('   1. Navigate to backend directory');
       console.log('   2. Run: npm run dev');
       console.log('   3. Backend should start on: http://localhost:5000\n');
@@ -272,14 +273,14 @@ class ServiceInitializer {
     }
 
     if (health.overallStatus === 'degraded') {
-      console.warn('⚠️  System is DEGRADED. Some services are unavailable.');
+      console.warn('System is DEGRADED. Some services are unavailable.');
     }
 
     if (health.overallStatus === 'healthy') {
-      console.log('✅ All systems operational!');
+      console.log('All systems operational!');
     }
 
-    console.log('\n📚 Available Services:');
+    console.log('\nAvailable Services:');
     const services = this.getAllServices();
     Object.keys(services).forEach(name => {
       console.log(`   • ${name}`);

@@ -4,10 +4,10 @@ import React, { useMemo, useState } from 'react';
 import Layout from '@/components/layout/Layout';
 
 const reportTypes = [
-  { id: 'revenue', name: 'Revenue', icon: '💰' },
-  { id: 'utilization', name: 'Utilization', icon: '⚡' },
-  { id: 'transactions', name: 'Transactions', icon: '📑' },
-  { id: 'commission', name: 'Commission', icon: '🧾' },
+  { id: 'revenue', name: 'Revenue', icon: 'REV' },
+  { id: 'utilization', name: 'Utilization', icon: 'UTL' },
+  { id: 'transactions', name: 'Transactions', icon: 'TXN' },
+  { id: 'commission', name: 'Commission', icon: 'COM' },
 ];
 
 const summaryCards = [

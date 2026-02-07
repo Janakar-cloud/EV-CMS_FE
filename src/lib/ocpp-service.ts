@@ -1,4 +1,4 @@
-﻿// ⚠️ IMPORTANT: This service uses REST API (port 5000), NOT direct OCPP WebSocket (port 8080)
+﻿// IMPORTANT: This service uses REST API (port 5000), NOT direct OCPP WebSocket (port 8080)
 // OCPP WebSocket is for charging stations only. Frontend uses REST API for all operations.
 
 import apiClient from './api-client';

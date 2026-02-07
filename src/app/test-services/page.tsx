@@ -37,26 +37,24 @@ export default function ServiceTestPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg backdrop-blur-sm p-8">
-          <h1 className="text-3xl font-bold mb-6 text-slate-100">
-            🔍 Service Health Check
-          </h1>
+        <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-8 backdrop-blur-sm">
+          <h1 className="mb-6 text-3xl font-bold text-slate-100">Service Health Check</h1>
 
           <div className="mb-6">
             <button
               onClick={runHealthCheck}
               disabled={loading}
-              className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-emerald-900/50"
+              className="rounded-lg bg-emerald-600 px-6 py-3 text-white shadow-lg shadow-emerald-900/50 transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? '⏳ Testing Services...' : '▶️ Run Health Check'}
+              {loading ? 'Testing Services...' : 'Run Health Check'}
             </button>
           </div>
 
           {health && (
             <div className="space-y-6">
               {/* Overall Status */}
-              <div className={`p-4 rounded-lg border ${getStatusColor(health.overallStatus)}`}>
-                <h2 className="text-xl font-semibold mb-2">
+              <div className={`rounded-lg border p-4 ${getStatusColor(health.overallStatus)}`}>
+                <h2 className="mb-2 text-xl font-semibold">
                   Overall Status: {health.overallStatus.toUpperCase()}
                 </h2>
                 <p className="text-sm opacity-75">
@@ -65,21 +63,21 @@ export default function ServiceTestPage() {
               </div>
 
               {/* Backend Status */}
-              <div className="border border-slate-700 bg-slate-800/30 rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-3 text-slate-100">Backend API</h3>
+              <div className="rounded-lg border border-slate-700 bg-slate-800/30 p-4">
+                <h3 className="mb-3 text-lg font-semibold text-slate-100">Backend API</h3>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-300">{health.backend.name}</span>
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                    className={`rounded-full border px-3 py-1 text-sm font-medium ${getStatusColor(
                       health.backend.status
                     )}`}
                   >
-                    {health.backend.status === 'healthy' ? '✅ Healthy' : '❌ Error'}
+                    {health.backend.status === 'healthy' ? 'Healthy' : 'Error'}
                   </span>
                 </div>
-                <p className="text-sm text-slate-400 mt-2">{health.backend.message}</p>
+                <p className="mt-2 text-sm text-slate-400">{health.backend.message}</p>
                 {health.backend.responseTime && (
-                  <p className="text-xs text-slate-300 mt-1">
+                  <p className="mt-1 text-xs text-slate-300">
                     Response time: {health.backend.responseTime}ms
                   </p>
                 )}
@@ -87,32 +85,30 @@ export default function ServiceTestPage() {
 
               {/* Service Status */}
               {health.services.length > 0 && (
-                <div className="border border-slate-700 bg-slate-800/30 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold mb-3 text-slate-100">
+                <div className="rounded-lg border border-slate-700 bg-slate-800/30 p-4">
+                  <h3 className="mb-3 text-lg font-semibold text-slate-100">
                     Services ({health.services.length} tested)
                   </h3>
                   <div className="space-y-2">
                     {health.services.map((service, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-3 bg-slate-900/40 border border-slate-700/50 rounded"
+                        className="flex items-center justify-between rounded border border-slate-700/50 bg-slate-900/40 p-3"
                       >
                         <div className="flex-1">
-                          <span className="text-slate-200 font-medium">{service.name}</span>
+                          <span className="font-medium text-slate-200">{service.name}</span>
                           <p className="text-sm text-slate-400">{service.message}</p>
                         </div>
                         <div className="flex items-center gap-3">
                           {service.responseTime && (
-                            <span className="text-xs text-slate-300">
-                              {service.responseTime}ms
-                            </span>
+                            <span className="text-xs text-slate-300">{service.responseTime}ms</span>
                           )}
                           <span
-                            className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                            className={`rounded-full border px-3 py-1 text-sm font-medium ${getStatusColor(
                               service.status
                             )}`}
                           >
-                            {service.status === 'healthy' ? '✅' : '❌'}
+                            {service.status === 'healthy' ? 'OK' : 'Error'}
                           </span>
                         </div>
                       </div>
@@ -123,11 +119,9 @@ export default function ServiceTestPage() {
 
               {/* Recommendations */}
               {health.overallStatus !== 'healthy' && (
-                <div className="bg-yellow-950/30 border border-yellow-800/50 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-yellow-400 mb-2">
-                    ⚠️ Recommendations
-                  </h3>
-                  <ul className="text-sm text-yellow-300/90 space-y-1">
+                <div className="rounded-lg border border-yellow-800/50 bg-yellow-950/30 p-4">
+                  <h3 className="mb-2 text-lg font-semibold text-yellow-400">Recommendations</h3>
+                  <ul className="space-y-1 text-sm text-yellow-300/90">
                     {health.backend.status === 'error' && (
                       <>
                         <li>• Start the backend server on port 5000</li>
@@ -143,10 +137,8 @@ export default function ServiceTestPage() {
               )}
 
               {/* Quick Actions */}
-              <div className="bg-emerald-950/30 border border-emerald-800/50 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-emerald-400 mb-2">
-                  🔗 Quick Links
-                </h3>
+              <div className="rounded-lg border border-emerald-800/50 bg-emerald-950/30 p-4">
+                <h3 className="mb-2 text-lg font-semibold text-emerald-400">Quick Links</h3>
                 <div className="space-y-1 text-sm text-emerald-300/90">
                   <p>
                     • Backend Health:{' '}
@@ -168,19 +160,21 @@ export default function ServiceTestPage() {
           )}
 
           {!health && !loading && (
-            <div className="text-center text-slate-400 py-12">
+            <div className="py-12 text-center text-slate-400">
               <p className="text-lg">Click "Run Health Check" to test all services</p>
-              <p className="text-sm mt-2 text-slate-300">This will verify backend connectivity and service availability</p>
+              <p className="mt-2 text-sm text-slate-300">
+                This will verify backend connectivity and service availability
+              </p>
             </div>
           )}
         </div>
 
         {/* Service List */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg backdrop-blur-sm p-8">
-          <h2 className="text-2xl font-bold mb-4 text-slate-100">
+        <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-8 backdrop-blur-sm">
+          <h2 className="mb-4 text-2xl font-bold text-slate-100">
             📦 Available Services (27 Total)
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
             {[
               'api-client',
               'auth-service',
@@ -209,9 +203,9 @@ export default function ServiceTestPage() {
               'socket-service',
               'gun-monitoring-service',
               'ocpp-service',
-            ].map((service) => (
-              <div key={service} className="bg-slate-900/40 border border-slate-700/50 p-3 rounded">
-                <span className="text-sm text-slate-300">✓ {service}</span>
+            ].map(service => (
+              <div key={service} className="rounded border border-slate-700/50 bg-slate-900/40 p-3">
+                <span className="text-sm text-slate-300">{service}</span>
               </div>
             ))}
           </div>

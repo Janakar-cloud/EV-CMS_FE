@@ -82,7 +82,7 @@ export default function DynamicPricingPage() {
   };
 
   const toggleRule = (id: string) => {
-    setRules(rules.map(r => r.id === id ? { ...r, active: !r.active } : r));
+    setRules(rules.map(r => (r.id === id ? { ...r, active: !r.active } : r)));
   };
 
   return (
@@ -90,34 +90,40 @@ export default function DynamicPricingPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-100">Dynamic Pricing</h1>
-          <button className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium transition-colors">
+          <button className="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition-colors hover:bg-emerald-500">
             + Add Rule
           </button>
         </div>
 
         {/* Info Box */}
-        <div className="bg-yellow-950/30 p-4 rounded-lg border border-yellow-800">
-          <h3 className="font-semibold text-yellow-400 mb-2">⚡ Dynamic Pricing</h3>
+        <div className="rounded-lg border border-yellow-800 bg-yellow-950/30 p-4">
+          <h3 className="mb-2 font-semibold text-yellow-400">Dynamic Pricing</h3>
           <p className="text-sm text-yellow-700">
-            Dynamic pricing automatically adjusts charging rates based on demand, time of day,
-            grid conditions, and other factors. Use these rules to optimize revenue and grid load.
+            Dynamic pricing automatically adjusts charging rates based on demand, time of day, grid
+            conditions, and other factors. Use these rules to optimize revenue and grid load.
           </p>
         </div>
 
         {/* Rules List */}
         <div className="space-y-4">
-          {rules.map((rule) => (
-            <div key={rule.id} className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+          {rules.map(rule => (
+            <div key={rule.id} className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="mb-2 flex items-center gap-3">
                     <h3 className="text-lg font-semibold text-slate-100">{rule.name}</h3>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${getTypeBadge(rule.type)}`}>
+                    <span
+                      className={`rounded px-2 py-1 text-xs font-medium ${getTypeBadge(rule.type)}`}
+                    >
                       {getTypeLabel(rule.type)}
                     </span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      rule.active ? 'bg-green-950/50 border border-green-800 text-green-400' : 'bg-slate-800/50 border border-slate-700 text-slate-400'
-                    }`}>
+                    <span
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${
+                        rule.active
+                          ? 'border border-green-800 bg-green-950/50 text-green-400'
+                          : 'border border-slate-700 bg-slate-800/50 text-slate-400'
+                      }`}
+                    >
                       {rule.active ? 'ACTIVE' : 'INACTIVE'}
                     </span>
                   </div>
@@ -135,10 +141,13 @@ export default function DynamicPricingPage() {
 
                   {rule.conditions.timeWindows && (
                     <div className="mt-4">
-                      <p className="text-sm text-slate-400 mb-2">Time Windows:</p>
+                      <p className="mb-2 text-sm text-slate-400">Time Windows:</p>
                       <div className="flex flex-wrap gap-2">
                         {rule.conditions.timeWindows.map((tw, idx) => (
-                          <span key={idx} className="px-3 py-1 bg-blue-50 text-blue-700 rounded text-sm">
+                          <span
+                            key={idx}
+                            className="rounded bg-blue-50 px-3 py-1 text-sm text-blue-700"
+                          >
                             {tw.start} - {tw.end}: {tw.multiplier}x
                           </span>
                         ))}
@@ -148,10 +157,13 @@ export default function DynamicPricingPage() {
 
                   {rule.conditions.demandThresholds && (
                     <div className="mt-4">
-                      <p className="text-sm text-slate-400 mb-2">Demand Thresholds:</p>
+                      <p className="mb-2 text-sm text-slate-400">Demand Thresholds:</p>
                       <div className="flex flex-wrap gap-2">
                         {rule.conditions.demandThresholds.map((dt, idx) => (
-                          <span key={idx} className="px-3 py-1 bg-orange-50 text-orange-700 rounded text-sm">
+                          <span
+                            key={idx}
+                            className="rounded bg-orange-50 px-3 py-1 text-sm text-orange-700"
+                          >
                             &gt;{dt.threshold}%: {dt.multiplier}x
                           </span>
                         ))}
@@ -182,19 +194,20 @@ export default function DynamicPricingPage() {
         </div>
 
         {/* Current Price Multiplier */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Current Price Effect</h2>
+        <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
+          <h2 className="mb-4 text-lg font-semibold">Current Price Effect</h2>
           <div className="flex items-center gap-8">
             <div className="text-center">
               <p className="text-sm text-slate-400">Current Multiplier</p>
               <p className="text-4xl font-bold text-blue-600">1.15x</p>
             </div>
-            <div className="flex-1 h-4 bg-slate-700 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" style={{ width: '57.5%' }} />
+            <div className="h-4 flex-1 overflow-hidden rounded-full bg-slate-700">
+              <div
+                className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500"
+                style={{ width: '57.5%' }}
+              />
             </div>
-            <div className="text-sm text-slate-400">
-              Base: ₹18/kWh → Current: ₹20.70/kWh
-            </div>
+            <div className="text-sm text-slate-400">Base: ₹18/kWh → Current: ₹20.70/kWh</div>
           </div>
         </div>
       </div>

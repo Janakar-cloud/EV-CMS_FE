@@ -68,7 +68,7 @@ export function useChargerSocket() {
     // Listen for charger status updates
     unsubscribers.push(
       subscribe('charger:status', (data: ChargerStatusUpdate) => {
-        console.log('📡 Charger status update:', data);
+        console.log('Charger status update:', data);
         setChargerUpdates(prev => [data, ...prev.slice(0, 99)]); // Keep last 100
       })
     );
@@ -76,7 +76,7 @@ export function useChargerSocket() {
     // Contract: station updates (use same local list for UI)
     unsubscribers.push(
       subscribe('station:update', (data: any) => {
-        console.log('📡 Station update:', data);
+        console.log('Station update:', data);
         const mapped: ChargerStatusUpdate = {
           chargerId: String(data?.chargerId ?? data?.evseId ?? data?.stationId ?? ''),
           status: toChargerStatus(data?.status),
@@ -90,7 +90,7 @@ export function useChargerSocket() {
     // Listen for charger connected/disconnected events
     unsubscribers.push(
       subscribe('charger:connected', (data: { chargerId: string }) => {
-        console.log('🔌 Charger connected:', data.chargerId);
+        console.log('Charger connected:', data.chargerId);
         setNotifications(prev => [
           {
             id: `${Date.now()}-connected`,
@@ -106,7 +106,7 @@ export function useChargerSocket() {
 
     unsubscribers.push(
       subscribe('charger:disconnected', (data: { chargerId: string }) => {
-        console.log('🔌 Charger disconnected:', data.chargerId);
+        console.log('Charger disconnected:', data.chargerId);
         setNotifications(prev => [
           {
             id: `${Date.now()}-disconnected`,
@@ -123,7 +123,7 @@ export function useChargerSocket() {
     // Listen for session updates
     unsubscribers.push(
       subscribe('session:started', (data: ChargingSessionUpdate) => {
-        console.log('⚡ Charging session started:', data);
+        console.log('Charging session started:', data);
         setNotifications(prev => [
           {
             id: `${Date.now()}-session`,
@@ -139,13 +139,13 @@ export function useChargerSocket() {
 
     unsubscribers.push(
       subscribe('session:update', (data: unknown) => {
-        console.log('⚡ Session update:', data);
+        console.log('Session update:', data);
       })
     );
 
     unsubscribers.push(
       subscribe('session:completed', (data: ChargingSessionUpdate) => {
-        console.log('✅ Charging session completed:', data);
+        console.log('Charging session completed:', data);
         setNotifications(prev => [
           {
             id: `${Date.now()}-completed`,
@@ -162,7 +162,7 @@ export function useChargerSocket() {
     // Listen for general notifications
     unsubscribers.push(
       subscribe('notification:new', (data: NotificationEvent) => {
-        console.log('🔔 New notification:', data);
+        console.log('New notification:', data);
         setNotifications(prev => [data, ...prev.slice(0, 49)]);
       })
     );
@@ -170,7 +170,7 @@ export function useChargerSocket() {
     // Contract: notification
     unsubscribers.push(
       subscribe('notification', (data: any) => {
-        console.log('🔔 Notification:', data);
+        console.log('Notification:', data);
         const mapped: NotificationEvent = {
           id: String(data?.id ?? `${Date.now()}-notification`),
           type: toNotificationType(data?.type),

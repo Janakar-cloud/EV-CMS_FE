@@ -56,13 +56,13 @@ const MapInfoWindow: React.FC<MapInfoWindowProps> = ({ map, charger, onClose }) 
     const getConnectorIcon = (type: string) => {
       switch (type) {
         case 'CCS2':
-          return '⚡';
+          return 'CCS2';
         case 'CHAdeMO':
-          return '🔌';
+          return 'CHA';
         case 'Type2':
-          return '🔌';
+          return 'T2';
         default:
-          return '🔌';
+          return type;
       }
     };
 
@@ -135,7 +135,7 @@ const MapInfoWindow: React.FC<MapInfoWindowProps> = ({ map, charger, onClose }) 
           alerts.length > 0
             ? `
           <div class="border-t pt-3 mt-3">
-            <h4 class="font-medium text-red-600 mb-2">⚠️ Active Alerts</h4>
+            <h4 class="font-medium text-red-600 mb-2">Active Alerts</h4>
             <div class="space-y-1">
               ${alerts
                 .map(

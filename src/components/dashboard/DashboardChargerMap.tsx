@@ -183,15 +183,15 @@ export function DashboardChargerMap() {
   const getStatusIcon = (status: string): string => {
     switch (status) {
       case 'available':
-        return '✓';
+        return 'A';
       case 'occupied':
-        return '⚡';
+        return 'O';
       case 'offline':
-        return '✕';
+        return 'X';
       case 'maintenance':
-        return '🔧';
+        return 'M';
       case 'faulted':
-        return '⚠';
+        return 'F';
       default:
         return '?';
     }
