@@ -117,7 +117,7 @@ export default function AdminUsersPage() {
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">{user.name}</h3>
                       <Badge variant={user.role === 'admin' ? 'default' : 'outline'}>
-                        {user.role}
+                        {user.role?.toUpperCase()}
                       </Badge>
                       <Badge variant={user.status === 'active' ? 'default' : 'destructive'}>
                         {user.status}
@@ -128,6 +128,20 @@ export default function AdminUsersPage() {
                         </Badge>
                       )}
                     </div>
+                    {user.tags && user.tags.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1 text-xs">
+                        {user.tags.slice(0, 3).map(tag => (
+                          <Badge key={tag} variant="outline">
+                            {tag}
+                          </Badge>
+                        ))}
+                        {user.tags.length > 3 && (
+                          <span className="text-[11px] text-muted-foreground">
+                            +{user.tags.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <p className="text-sm text-muted-foreground">{user.email}</p>
                     {user.phone && <p className="text-sm text-muted-foreground">{user.phone}</p>}
                     <div className="mt-1 flex gap-4 text-xs text-muted-foreground">

@@ -16,6 +16,8 @@ export default function FranchiseStaffPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const loadFranchises = useCallback(async () => {
     try {
@@ -32,7 +34,7 @@ export default function FranchiseStaffPage() {
     setLoading(true);
     try {
       const allStaff: StaffWithFranchise[] = [];
-      
+
       // Load staff for all franchises
       for (const franchise of franchiseList) {
         try {
@@ -47,7 +49,7 @@ export default function FranchiseStaffPage() {
           // Skip franchises with no staff API or errors
         }
       }
-      
+
       // If API returns empty, use mock data for demonstration
       if (allStaff.length === 0 && franchiseList.length > 0) {
         const mockStaff: StaffWithFranchise[] = franchiseList.flatMap((f, idx) => [
@@ -74,7 +76,7 @@ export default function FranchiseStaffPage() {
         ]);
         allStaff.push(...mockStaff);
       }
-      
+
       setStaff(allStaff);
       setError(null);
     } catch (err) {
@@ -94,10 +96,13 @@ export default function FranchiseStaffPage() {
 
   const filteredStaff = staff.filter(s => {
     const matchesFranchise = selectedFranchise === 'all' || s.franchiseId === selectedFranchise;
-    const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          s.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          s.role.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesFranchise && matchesSearch;
+    const matchesSearch =
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.role.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRole = roleFilter === 'all' || s.role.toLowerCase() === roleFilter.toLowerCase();
+    const matchesStatus = statusFilter === 'all' || s.status === statusFilter;
+    return matchesFranchise && matchesSearch && matchesRole && matchesStatus;
   });
 
   const getStatusBadge = (status: string) => {
@@ -129,100 +134,149 @@ export default function FranchiseStaffPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-100">Franchise Staff</h1>
-          <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 font-medium transition-colors">
+          <button className="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition-colors hover:bg-emerald-500">
             + Add Staff Member
           </button>
         </div>
 
         {error && (
-          <div className="p-4 bg-red-950/50 border border-red-800 text-red-400 rounded-lg">{error}</div>
+          <div className="rounded-lg border border-red-800 bg-red-950/50 p-4 text-red-400">
+            {error}
+          </div>
         )}
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
             <p className="text-sm text-slate-400">Total Staff</p>
             <p className="text-2xl font-bold text-slate-100">{staff.length}</p>
           </div>
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+          <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
             <p className="text-sm text-slate-400">Active</p>
             <p className="text-2xl font-bold text-green-400">
               {staff.filter(s => s.status === 'active').length}
             </p>
           </div>
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+          <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
             <p className="text-sm text-slate-400">Managers</p>
             <p className="text-2xl font-bold text-purple-400">
               {staff.filter(s => s.role.toLowerCase() === 'manager').length}
             </p>
           </div>
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+          <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
             <p className="text-sm text-slate-400">Franchises</p>
             <p className="text-2xl font-bold text-blue-400">{franchises.length}</p>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Search</label>
+              <label className="mb-1 block text-sm font-medium text-slate-300">Search</label>
               <input
                 type="text"
                 placeholder="Search by name, email, or role..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500"
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full rounded-lg border border-slate-700 px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">Franchise</label>
+              <label className="mb-1 block text-sm font-medium text-slate-300">Franchise</label>
               <select
                 value={selectedFranchise}
-                onChange={(e) => setSelectedFranchise(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500"
+                onChange={e => setSelectedFranchise(e.target.value)}
+                className="w-full rounded-lg border border-slate-700 px-3 py-2 focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Franchises</option>
                 {franchises.map(f => (
-                  <option key={f._id} value={f._id}>{f.name}</option>
+                  <option key={f._id} value={f._id}>
+                    {f.name}
+                  </option>
                 ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-300">Role</label>
+              <select
+                value={roleFilter}
+                onChange={e => setRoleFilter(e.target.value)}
+                className="w-full rounded-lg border border-slate-700 px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Roles</option>
+                <option value="manager">Manager</option>
+                <option value="operator">Operator</option>
+                <option value="technician">Technician</option>
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-300">Status</label>
+              <select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+                className="w-full rounded-lg border border-slate-700 px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
               </select>
             </div>
           </div>
         </div>
 
         {/* Staff Table */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
+        <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-800/50">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-700">
               <thead className="bg-slate-900/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Staff Member</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Franchise</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Joined</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Staff Member
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Franchise
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Role
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Joined
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-slate-400">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700">
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-slate-400">Loading staff...</td>
+                    <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
+                      Loading staff...
+                    </td>
                   </tr>
                 ) : filteredStaff.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-slate-400">No staff members found</td>
+                    <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
+                      No staff members found
+                    </td>
                   </tr>
                 ) : (
-                  filteredStaff.map((member) => (
+                  filteredStaff.map(member => (
                     <tr key={member._id}>
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           <div className="h-10 w-10 flex-shrink-0">
-                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                              <span className="text-blue-600 font-medium">
-                                {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                              <span className="font-medium text-blue-600">
+                                {member.name
+                                  .split(' ')
+                                  .map(n => n[0])
+                                  .join('')
+                                  .slice(0, 2)}
                               </span>
                             </div>
                           </div>
@@ -234,12 +288,16 @@ export default function FranchiseStaffPage() {
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-100">{member.franchiseName}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 text-xs rounded-full ${getRoleBadge(member.role)}`}>
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs ${getRoleBadge(member.role)}`}
+                        >
                           {member.role}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadge(member.status)}`}>
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs ${getStatusBadge(member.status)}`}
+                        >
                           {member.status}
                         </span>
                       </td>
@@ -247,7 +305,7 @@ export default function FranchiseStaffPage() {
                         {new Date(member.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        <button className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
+                        <button className="mr-3 text-blue-600 hover:text-blue-900">Edit</button>
                         <button className="text-red-600 hover:text-red-900">Remove</button>
                       </td>
                     </tr>

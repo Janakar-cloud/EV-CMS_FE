@@ -4,6 +4,8 @@
   fullName: string;
   email: string;
   phone: string;
+  role: 'admin' | 'brand' | 'user';
+  tags?: string[];
   status: 'active' | 'inactive' | 'blocked';
   createdAt: Date;
   updatedAt: Date;
@@ -14,6 +16,8 @@ export interface CreateUserRequest {
   fullName: string;
   email: string;
   phone: string;
+  role?: 'admin' | 'brand' | 'user';
+  tags?: string[];
 }
 
 export interface UserValidationError {

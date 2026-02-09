@@ -111,7 +111,7 @@ export default function AdminUserDetailPage() {
                 KYC: {user.kycStatus}
               </Badge>
             ) : null}
-            <Badge variant="outline">Role: {user.role}</Badge>
+            <Badge variant="outline">Role: {user.role?.toUpperCase()}</Badge>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">

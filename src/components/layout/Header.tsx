@@ -48,12 +48,6 @@ export default function Header() {
             >
               Home
             </Link>
-            <Link
-              href="/about"
-              className="font-medium text-slate-200 transition-colors hover:text-emerald-400"
-            >
-              About
-            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-x-4 lg:gap-x-6">

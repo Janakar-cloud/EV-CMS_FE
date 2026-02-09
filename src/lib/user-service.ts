@@ -60,7 +60,9 @@ class AdminUserService {
    */
   async getBlockedUsers(filters?: BlockedUsersFilters): Promise<AdminUserListResponse> {
     try {
-      const response = await apiClient.get(`${AdminUserService.API_BASE}/blocked`, { params: filters });
+      const response = await apiClient.get(`${AdminUserService.API_BASE}/blocked`, {
+        params: filters,
+      });
       const data = unwrap<any>(response);
       if (Array.isArray(data)) {
         return { users: data, total: data.length, page: 1, pages: 1 };
@@ -105,7 +107,9 @@ class AdminUserService {
    */
   async updateUserStatus(id: string, isActive: boolean): Promise<User> {
     try {
-      const response = await apiClient.put(`${AdminUserService.API_BASE}/${id}/status`, { isActive });
+      const response = await apiClient.put(`${AdminUserService.API_BASE}/${id}/status`, {
+        isActive,
+      });
       return unwrap<User>(response);
     } catch (error) {
       throw this.handleError(error);
@@ -168,7 +172,7 @@ class AdminUserService {
     if (!userData.fullName || userData.fullName.trim().length < 2) {
       errors.push({
         field: 'fullName',
-        message: 'Full name must be at least 2 characters long'
+        message: 'Full name must be at least 2 characters long',
       });
     }
 
@@ -176,7 +180,7 @@ class AdminUserService {
     if (!userData.email || !emailRegex.test(userData.email)) {
       errors.push({
         field: 'email',
-        message: 'Please enter a valid email address'
+        message: 'Please enter a valid email address',
       });
     }
 
@@ -184,14 +188,14 @@ class AdminUserService {
     if (!userData.phone || !phoneRegex.test(userData.phone)) {
       errors.push({
         field: 'phone',
-        message: 'Please enter a valid phone number (minimum 10 digits)'
+        message: 'Please enter a valid phone number (minimum 10 digits)',
       });
     }
 
     if (!userData.userid || userData.userid.trim().length < 3) {
       errors.push({
         field: 'userid',
-        message: 'User ID must be at least 3 characters long'
+        message: 'User ID must be at least 3 characters long',
       });
     }
 
@@ -229,7 +233,7 @@ export const userService = {
     } catch (error: any) {
       return {
         success: false,
-        errors: [{ field: 'general', message: error.message || 'Failed to create user' }]
+        errors: [{ field: 'general', message: error.message || 'Failed to create user' }],
       };
     }
   },
@@ -244,6 +248,18 @@ export const userService = {
     return response.users;
   },
 
+  updateUserRole: async (id: string, role: User['role']): Promise<UserResponse> => {
+    try {
+      const user = await adminUserService.updateUser(id, { role });
+      return { success: true, user };
+    } catch (error: any) {
+      return {
+        success: false,
+        errors: [{ field: 'role', message: error.message || 'Failed to update role' }],
+      };
+    }
+  },
+
   updateUserStatus: async (id: string, status: User['status']): Promise<UserResponse> => {
     try {
       const user = await adminUserService.updateUserStatus(id, status === 'active');
@@ -251,7 +267,7 @@ export const userService = {
     } catch (error: any) {
       return {
         success: false,
-        errors: [{ field: 'status', message: error.message || 'Failed to update status' }]
+        errors: [{ field: 'status', message: error.message || 'Failed to update status' }],
       };
     }
   },
@@ -259,12 +275,14 @@ export const userService = {
   checkUserIdAvailability: async (userid: string): Promise<{ available: boolean }> => {
     try {
       const response = await adminUserService.listUsers({ search: userid });
-      const isAvailable = !response.users.some(u => u.userid?.toLowerCase() === userid.toLowerCase());
+      const isAvailable = !response.users.some(
+        u => u.userid?.toLowerCase() === userid.toLowerCase()
+      );
       return { available: isAvailable };
     } catch {
       return { available: true };
     }
-  }
+  },
 };
 
 export { adminUserService };

@@ -98,8 +98,7 @@ export default function LoginPage() {
             </div>
 
             <div className="text-center text-sm text-slate-400">
-              Need a backend check? Please confirm which login APIs are already available and
-              whether any additional endpoints are needed for this flow.
+              Do not have an account? Please contact your EV CMS administrator to get access.
             </div>
           </div>
         </section>

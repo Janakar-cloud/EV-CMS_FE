@@ -11,6 +11,7 @@ export interface AdminUserSummary {
   createdAt: string;
   lastLogin?: string;
   segments?: string[];
+  tags?: string[];
 }
 
 export interface AdminUserListResult {

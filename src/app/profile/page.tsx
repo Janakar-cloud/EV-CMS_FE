@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { profileService } from '@/lib/profile-service';
 import { uploadService } from '@/lib/upload-service';
+import { authService } from '@/lib/auth-service';
 import type { User, UpdateProfileRequest } from '@/types/profile';
 import { toast } from 'sonner';
 import { Loader2, Upload, User as UserIcon } from 'lucide-react';
@@ -19,6 +20,10 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState<UpdateProfileRequest>({});
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   useEffect(() => {
     loadProfile();
@@ -46,7 +51,7 @@ export default function ProfilePage() {
     setUploading(true);
     try {
       const result = await uploadService.uploadFile(file, 'profile');
-      setFormData((prev) => ({ ...prev, profilePicture: result.url }));
+      setFormData(prev => ({ ...prev, profilePicture: result.url }));
       toast.success('Profile picture uploaded');
     } catch (error: any) {
       toast.error(error.message || 'Failed to upload image');
@@ -67,6 +72,40 @@ export default function ProfilePage() {
       toast.error(error.message || 'Failed to update profile');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error('Please fill in all password fields');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error('New password and confirmation do not match');
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      const response = await authService.changePassword(currentPassword, newPassword);
+      if (response.success) {
+        toast.success(response?.message || 'Password changed successfully');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else if (response && Array.isArray(response.errors) && response.errors.length > 0) {
+        const firstError = response.errors[0];
+        toast.error(firstError?.message || 'Password change failed');
+      } else {
+        toast.error(response?.message || 'Password change failed');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to change password');
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -93,6 +132,7 @@ export default function ProfilePage() {
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile">
@@ -134,9 +174,7 @@ export default function ProfilePage() {
                       onChange={handleImageUpload}
                       disabled={uploading}
                     />
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      JPG, PNG or GIF. Max 5MB.
-                    </p>
+                    <p className="mt-2 text-sm text-muted-foreground">JPG, PNG or GIF. Max 5MB.</p>
                   </div>
                 </div>
 
@@ -146,7 +184,7 @@ export default function ProfilePage() {
                   <Input
                     id="name"
                     value={formData.name || ''}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Enter your full name"
                   />
                 </div>
@@ -165,7 +203,7 @@ export default function ProfilePage() {
                     id="phone"
                     type="tel"
                     value={formData.phone || ''}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="Enter your phone number"
                   />
                 </div>
@@ -198,6 +236,72 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">Preferences management coming soon...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="security">
+          <Card>
+            <CardHeader>
+              <CardTitle>Security</CardTitle>
+              <CardDescription>Update your password to keep your account secure</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleChangePassword} className="max-w-lg space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    autoComplete="current-password"
+                    value={currentPassword}
+                    onChange={e => setCurrentPassword(e.target.value)}
+                    placeholder="Enter your current password"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">New Password</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    placeholder="Enter a new password"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter the new password"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-4 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setCurrentPassword('');
+                      setNewPassword('');
+                      setConfirmPassword('');
+                    }}
+                  >
+                    Clear
+                  </Button>
+                  <Button type="submit" disabled={changingPassword}>
+                    {changingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Update Password
+                  </Button>
+                </div>
+              </form>
             </CardContent>
           </Card>
         </TabsContent>
